@@ -1,0 +1,50 @@
+-- Build file for Aw_Lib.
+--
+-- author Marcelo Coraça de Freitas <marcelo.batera@gmail.com> 
+--
+-- Repository information:
+-- $Date: 2008-02-25 19:47:48 -0300 (Seg, 25 Fev 2008) $
+-- $Revision: 234 $
+-- $Author: ogro $
+
+
+with "awconfig";
+with "awent";
+with "awlib";
+with "awsec";
+
+
+project AwSec.Ent is
+
+	version := AwLib.version;
+	
+	type Supported_OS is ("Windows_NT", "GNU/Linux");
+
+	target: Supported_OS := external("OS", "GNU/Linux");
+
+	for Source_Dirs use ( "src" ) ;
+	
+	for Object_Dir use "obj";
+	
+	-- LIBRARY
+	for Library_Dir use "lib";
+	for Library_Name use "awsec-ent";
+	case target is
+		when "Windows_NT" =>
+			for Library_Kind use "dynamic";
+
+		when "GNU/Linux" =>
+			for Library_Kind use "dynamic";
+	end case;
+	for Library_Version use "libawsec-ent.so." & Version;
+	
+	
+	package Compiler is
+		for Default_Switches ("Ada") use ("-O2", "-gnat05");
+	end Compiler;
+
+	package Linker is
+		for Default_Switches ( "Ada" ) use AwLib.Linker'Default_Switches( "Ada" );
+	end Linker;
+end AwSec.Ent;
+
