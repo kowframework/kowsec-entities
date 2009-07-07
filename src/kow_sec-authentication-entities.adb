@@ -1,7 +1,7 @@
 
 
 
-package Aw_Sec.Authentication.Entities is
+package body KOW_Sec.Authentication.Entities is
 
 	-------------------------------
 	-- AUTHENTICATION MANAGEMENT --
@@ -14,7 +14,29 @@ package Aw_Sec.Authentication.Entities is
 		-- This object might be a direct instance of User or a subclass.
 		-- It's this way so the authentication method might have
 		-- a user with extended properties.
+		use User_Query_Builders;
+
+		Q : Query_Type;
 	begin
+		Append(
+				Q		=> Q,
+				Column		=> "username",
+				Value		=> Username,
+				Appender	=> Appender_AND,
+				Operator	=> Operator_Equals
+			);
+
+		Append_Password(
+				Q		=> Q,
+				Column		=> "password",
+				Value		=> Password,
+				Appender	=> Appender_AND,
+				Operator	=> Operator_Equals
+			);
+		return To_User( Get_First( Q => Query, Unique => True ) );
+	exception
+		when NO_ENTITY =>
+			raise KOW_Sec.INVALID_CREDENTIALS with "Login for the user """ & Username & """ failed!";
 	end Do_Login;
 
 
@@ -36,4 +58,4 @@ package Aw_Sec.Authentication.Entities is
 	begin
 	end Get_Groups;
 
-end Aw_Sec.Authentication.Entities;
+end KOW_Sec.Authentication.Entities;

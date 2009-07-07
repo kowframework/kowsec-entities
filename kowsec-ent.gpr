@@ -1,4 +1,4 @@
--- Build file for Aw_Lib.
+-- Build file for KOW_Lib.
 --
 -- author Marcelo Coraça de Freitas <marcelo.batera@gmail.com> 
 --
@@ -8,15 +8,15 @@
 -- $Author: ogro $
 
 
-with "awconfig";
-with "awent";
-with "awlib";
-with "awsec";
+with "kowconfig";
+with "kowent";
+with "kowlib";
+with "kowsec";
 
 
-project AwSec.Ent is
+project KOWSec.Ent is
 
-	version := AwLib.version;
+	version := KOWLib.version;
 	
 	type Supported_OS is ("Windows_NT", "GNU/Linux");
 
@@ -28,7 +28,7 @@ project AwSec.Ent is
 	
 	-- LIBRARY
 	for Library_Dir use "lib";
-	for Library_Name use "awsec-ent";
+	for Library_Name use "kowsec-ent";
 	case target is
 		when "Windows_NT" =>
 			for Library_Kind use "dynamic";
@@ -36,7 +36,7 @@ project AwSec.Ent is
 		when "GNU/Linux" =>
 			for Library_Kind use "dynamic";
 	end case;
-	for Library_Version use "libawsec-ent.so." & Version;
+	for Library_Version use "libkowsec-ent.so." & Version;
 	
 	
 	package Compiler is
@@ -44,7 +44,7 @@ project AwSec.Ent is
 	end Compiler;
 
 	package Linker is
-		for Default_Switches ( "Ada" ) use AwLib.Linker'Default_Switches( "Ada" );
+		for Default_Switches ( "Ada" ) use KOWLib.Linker'Default_Switches( "Ada" );
 	end Linker;
-end AwSec.Ent;
+end KOWSec.Ent;
 

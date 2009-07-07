@@ -3,18 +3,19 @@
 ---------------
 -- Ada Works --
 ---------------
-with Aw_Ent;
-with Aw_Sec;
+with KOW_Ent;
+with KOW_Ent.Query_Builders;
+with KOW_Sec;
 
 
-package Aw_Sec.Authentication.Entities is
+package KOW_Sec.Authentication.Entities is
 
 
 	----------------------
 	-- USER ENTITY TYPE --
 	----------------------
 
-	type User_Entity_Type is new Aw_Ent.Entity_Type with private;
+	type User_Entity_Type is new KOW_Ent.Entity_Type with private;
 	-- This represents the user data in the data base
 	-- The ID for this entity is the Hash code for the username
 	--
@@ -26,10 +27,10 @@ package Aw_Sec.Authentication.Entities is
 	-- return the user identity
 
 	
-	function To_User( Entity : in User_Entity_Type ) return Aw_Sec.User;
-	-- convert the entity to an aw_sec.user type
+	function To_User( Entity : in User_Entity_Type ) return KOW_Sec.User;
+	-- convert the entity to an KOW_sec.user type
 
-	function To_User_Entity( Entity : in Aw_Sec.User'Class ) return User_Entity_Type;
+	function To_User_Entity( Entity : in KOW_Sec.User'Class ) return User_Entity_Type;
 	-- convert the user type to an user entity type
 	-- assumes the user is already in the database.
 
@@ -38,7 +39,7 @@ package Aw_Sec.Authentication.Entities is
 	-- AUTHENTICATION MANAGEMENT --
 	-------------------------------
 
-	type Authentication_Manager is Aw_Sec.Authentication_Manager with private;
+	type Authentication_Manager is KOW_Sec.Authentication_Manager with private;
 	-- This is where the magic happens!
 	--
 	-- The Authentication_Manager type is the type that should be extended
@@ -75,7 +76,10 @@ package Aw_Sec.Authentication.Entities is
 
 
 
-private
-	type Authentication_Manager is Aw_Sec.Authentication_Manager with null record;
 
-end Aw_Sec.Authentication.Entities;
+	package User_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => User_Entity_Type );
+
+private
+	type Authentication_Manager is KOW_Sec.Authentication_Manager with null record;
+
+end KOW_Sec.Authentication.Entities;
