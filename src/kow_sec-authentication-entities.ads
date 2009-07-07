@@ -87,8 +87,6 @@ package KOW_Sec.Authentication.Entities is
 
 
 
-	package User_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => User_Entity_Type );
-	package Group_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => Group_Entity_Type );
 
 private
 	type User_Entity_Type is new KOW_Ent.Entity_Type with record
@@ -96,11 +94,13 @@ private
 		-- there is no really need to duplicate all the parameters in here
 		-- instead, we have a nested user
 	end record;
+	package User_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => User_Entity_Type );
 	
 	type Group_Entity_Type is new KOW_Ent.Entity_Type with record
 		Group : KOW_Sec.Authorization_Group;
 		User  : Unbounded_String;
 	end record;
+	package Group_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => Group_Entity_Type );
 
 	type Authentication_Manager is new KOW_Sec.Authentication_Manager with null record;
 

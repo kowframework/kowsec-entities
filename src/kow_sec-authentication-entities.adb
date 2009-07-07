@@ -3,7 +3,7 @@
 --------------
 -- Ada 2005 --
 --------------
-with Ada.Strings;
+with Ada.Strings.Hash;
 
 ---------
 -- APQ --
@@ -31,23 +31,22 @@ package body KOW_Sec.Authentication.Entities is
 	-------------------
 	-- ID Generators --
 	-------------------
-	function Generate_User_Id( User : in KOW_Sec.User'Class ) return Id_Type is
-		ID : KOW_Sec.Id_Type;
+	function Generate_User_Id( User : in KOW_Ent.Entity_Type'Class ) return KOW_Ent.Id_Type is
+		ID : KOW_Ent.Id_Type;
 	begin
 		ID.My_Tag := User'Tag;
-		ID.Value := Calculate_Hashed_Id( KOW_Sec.Identity( User ) );
+		ID.Value := Calculate_Hashed_Id( KOW_Sec.Identity( User_Entity_Type( User ).User ) );
 		return ID;
 	end Generate_User_Id;
 
 
-	function Generate_Group_Id( Group : in KOW_Sec.User'Class ) return Id_Type is
-		ID : KOW_Sec.Id_Type;
+	function Generate_Group_Id( Group : in KOW_Ent.Entity_Type'Class ) return KOW_Ent.Id_Type is
+		ID : KOW_Ent.Id_Type;
 	begin
 		ID.My_Tag := Group'Tag;
 		ID.Value := Calculate_Hashed_Id(
-						KOW_Sec.Identity( User ) & "::" &
-						To_String( Group_Entity_Type( Group ).Group
-					)
+					To_String( Group_Entity_Type( Group ).User )  & "::" &
+					To_String( Group_Entity_Type( Group ).Group )
 				);
 		return ID;
 	end Generate_Group_Id;
@@ -78,9 +77,22 @@ package body KOW_Sec.Authentication.Entities is
 		Entity : User_Entity_Type;
 	begin
 		Entity.User := User;
-		Entity.Id := Generate_User_ID( User );
+		Entity.Id := Generate_User_ID( Entity );
 		return Entity;
 	end To_User_Entity;
+
+
+
+	------------------
+	-- Group Entity --
+	------------------
+	
+	overriding
+	function To_String( Entity : in Group_Entity_Type ) return String is
+		-- return the group name
+	begin
+		return To_String( Entity.Group );
+	end To_String;
 
 
 	-------------------------------
@@ -113,7 +125,7 @@ package body KOW_Sec.Authentication.Entities is
 				Appender	=> Appender_AND,
 				Operator	=> Operator_Equals
 			);
-		return To_User( Get_First( Q => Query, Unique => True ) );
+		return To_User( Get_First( Q => Q, Unique => True ) );
 	exception
 		when NO_ENTITY =>
 			raise KOW_Sec.INVALID_CREDENTIALS with "Login for the user """ & Username & """ failed!";
@@ -131,7 +143,7 @@ package body KOW_Sec.Authentication.Entities is
 		begin
 			KOW_Sec.Authorization_Group_Vectors.Append(
 						The_Groups,
-						Element( C ).Group
+						Entity_Vectors.Element( C ).Group
 					);
 		end Iterator;
 
@@ -139,7 +151,8 @@ package body KOW_Sec.Authentication.Entities is
 	begin
 		Append(
 				Q		=> Q,
-				Column		=> "user"
+				Column		=> "user",
+				Value		=> KOW_Sec.Identity( User_Object )
 			);
 		Entity_Vectors.Iterate(
 				Get_All( Q ),
