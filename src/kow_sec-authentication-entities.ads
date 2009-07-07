@@ -1,5 +1,12 @@
 
 
+
+--------------
+-- Ada 2005 --
+--------------
+with Ada.Strings.Unbounded;		use Ada.Strings.Unbounded;
+
+
 ---------------
 -- Ada Works --
 ---------------
@@ -30,16 +37,30 @@ package KOW_Sec.Authentication.Entities is
 	function To_User( Entity : in User_Entity_Type ) return KOW_Sec.User;
 	-- convert the entity to an KOW_sec.user type
 
-	function To_User_Entity( Entity : in KOW_Sec.User'Class ) return User_Entity_Type;
+	function To_User_Entity( User : in KOW_Sec.User ) return User_Entity_Type;
 	-- convert the user type to an user entity type
 	-- assumes the user is already in the database.
 
+
+
+	------------------
+	-- Group Entity --
+	------------------
+	
+	type Group_Entity_Type is new KOW_Ent.Entity_Type with private;
+	-- represents an authorization group in the database
+	-- note that it's not related to the Entity_Type class
+	-- This is to be compatible with the main KOW_Sec's specification
+
+	overriding
+	function To_String( Entity : in Group_Entity_Type ) return String;
+	-- return the group name
 
 	-------------------------------
 	-- AUTHENTICATION MANAGEMENT --
 	-------------------------------
 
-	type Authentication_Manager is KOW_Sec.Authentication_Manager with private;
+	type Authentication_Manager is new KOW_Sec.Authentication_Manager with private;
 	-- This is where the magic happens!
 	--
 	-- The Authentication_Manager type is the type that should be extended
@@ -61,25 +82,26 @@ package KOW_Sec.Authentication.Entities is
 	function Get_Groups(	Manager:	in Authentication_Manager;
 				User_Object:	in User'Class )
 				return Authorization_Groups;
-	-- Return all the groups for this user in _this_ manager.
-	-- This function is called by the Groups_Cache_Type's method Update.
-	-- It's implemented in the manager for 2 reasons:
-	-- 	1. this way we can store the users and the groups in
-	-- 	  different managers.
-	-- 	2. the information on how to obtain the groups information
-	-- 	  doesn't belong to the user itself.
-	-- When implementor of this method should assume:
-	-- 	1. the user is valid and so is the results of Identity( User_Object );
-	-- 	2. it's meant to work with any authentication manager vs user combination.
-	-- This is a private method so the user won't call it directly.
-	-- Instead, it's called by the Get_Groups (User'Class) method implemented here.
+	-- get the groups for this user... entity group_entity
 
 
 
 
 	package User_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => User_Entity_Type );
+	package Group_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => Group_Entity_Type );
 
 private
-	type Authentication_Manager is KOW_Sec.Authentication_Manager with null record;
+	type User_Entity_Type is new KOW_Ent.Entity_Type with record
+		User : KOW_Sec.User;
+		-- there is no really need to duplicate all the parameters in here
+		-- instead, we have a nested user
+	end record;
+	
+	type Group_Entity_Type is new KOW_Ent.Entity_Type with record
+		Group : KOW_Sec.Authorization_Group;
+		User  : Unbounded_String;
+	end record;
+
+	type Authentication_Manager is new KOW_Sec.Authentication_Manager with null record;
 
 end KOW_Sec.Authentication.Entities;
