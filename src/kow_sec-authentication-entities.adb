@@ -45,10 +45,7 @@ package body KOW_Sec.Authentication.Entities is
 		ID : KOW_Ent.Id_Type;
 	begin
 		ID.My_Tag := Group'Tag;
-		ID.Value := Calculate_Hashed_Id(
-					To_String( Group_Entity_Type( Group ).User_Identity )  & "::" &
-					To_String( Group_Entity_Type( Group ).Group )
-				);
+		ID.Value := Calculate_Hashed_Id( To_String( Group ) );
 		return ID;
 	end Generate_Group_Id;
 
@@ -92,7 +89,7 @@ package body KOW_Sec.Authentication.Entities is
 	function To_String( Entity : in Group_Entity_Type ) return String is
 		-- return the group name
 	begin
-		return To_String( Entity.Group );
+		return To_String( Entity.User_Identity )  & "::" & To_String( Entity.Group );
 	end To_String;
 
 
@@ -152,7 +149,7 @@ package body KOW_Sec.Authentication.Entities is
 	begin
 		Append(
 				Q		=> Q,
-				Column		=> "user",
+				Column		=> "user_identity",
 				Value		=> KOW_Sec.Identity( User_Object )
 			);
 		Entity_Vectors.Iterate(

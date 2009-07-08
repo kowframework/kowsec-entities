@@ -14,7 +14,7 @@ with "kowlib";
 with "kowsec";
 
 
-project KOWSec.Ent is
+project KOWSec.Entities is
 
 	version := KOWLib.version;
 	
@@ -46,5 +46,5 @@ project KOWSec.Ent is
 	package Linker is
 		for Default_Switches ( "Ada" ) use KOWLib.Linker'Default_Switches( "Ada" );
 	end Linker;
-end KOWSec.Ent;
+end KOWSec.Entities;
 
