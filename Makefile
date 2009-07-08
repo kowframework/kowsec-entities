@@ -3,7 +3,7 @@
 # @author Marcelo Coraça de Freitas <marcelo.batera@gmail.com> 
 
 
-projectFile="kowsec-ent.gpr"
+projectFile="kowsec-entities.gpr"
 
 
 libs:
