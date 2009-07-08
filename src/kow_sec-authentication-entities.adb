@@ -169,6 +169,12 @@ package body KOW_Sec.Authentication.Entities is
 	------------------------------------------------
 
 
+	-- factory ::
+	function User_Entity_Factory return Entity_Type'Class is
+		Entity: User_Entity_Type;
+	begin
+		return Entity;
+	end User_Entity_Factory;
 
 	-- 
 	-- username
@@ -247,6 +253,14 @@ package body KOW_Sec.Authentication.Entities is
 	-- Getter and Setter for the Group Entity Type --
 	-------------------------------------------------
 
+
+	-- factory ::
+	function Group_Entity_Factory return Entity_Type'Class is
+		Entity : Group_Entity_Type;
+	begin
+		return Entity;
+	end Group_Entity_Factory;
+
 	--
 	-- Group
 	--
@@ -287,7 +301,8 @@ begin
 	KOW_Ent.Entity_Registry.Register(
 			Entity_Tag	=> User_Entity_Type'Tag,
 			Table_Name	=> "kow_users",
-			Id_Generator	=> Generate_User_Id'Access
+			Id_Generator	=> Generate_User_Id'Access,
+			Factory		=> User_Entity_Factory'Access
 		);
 	
 	KOW_Ent.Entity_Registry.Add_Property(
@@ -327,7 +342,8 @@ begin
 	KOW_Ent.Entity_Registry.Register(
 			Entity_Tag	=> Group_Entity_Type'Tag,
 			Table_Name	=> "kow_groups",
-			Id_Generator	=> Generate_Group_Id'Access
+			Id_Generator	=> Generate_Group_Id'Access,
+			Factory		=> Group_Entity_Factory'Access
 		);
 	KOW_Ent.Entity_Registry.Add_Property(
 			Entity_Tag	=> Group_Entity_Type'Tag,
@@ -340,7 +356,7 @@ begin
 	KOW_Ent.Entity_Registry.Add_Property(
 			Entity_Tag	=> Group_Entity_Type'Tag,
 			Property	=> KOW_Ent.Properties.New_UString_Property(
-						Column_Name	=> "group",
+						Column_Name	=> "group_name",
 						Getter		=> Get_G_Group'Access,
 						Setter		=> Set_G_Group'Access
 					)
