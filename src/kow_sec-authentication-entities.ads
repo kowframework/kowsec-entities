@@ -93,12 +93,15 @@ private
 		User : KOW_Sec.User;
 		-- there is no really need to duplicate all the parameters in here
 		-- instead, we have a nested user
+
+		Password : Unbounded_String;
+		-- well, we need some place to store user's password, don't we?
 	end record;
 	package User_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => User_Entity_Type );
 	
 	type Group_Entity_Type is new KOW_Ent.Entity_Type with record
-		Group : KOW_Sec.Authorization_Group;
-		User  : Unbounded_String;
+		Group		: KOW_Sec.Authorization_Group;
+		User_Identity	: Unbounded_String;
 	end record;
 	package Group_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => Group_Entity_Type );
 

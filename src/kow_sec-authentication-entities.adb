@@ -13,7 +13,7 @@ with APQ;
 -------------------
 -- KOW Framework --
 -------------------
-
+with KOW_Ent;		use KOW_Ent;
 
 package body KOW_Sec.Authentication.Entities is
 
@@ -45,7 +45,7 @@ package body KOW_Sec.Authentication.Entities is
 	begin
 		ID.My_Tag := Group'Tag;
 		ID.Value := Calculate_Hashed_Id(
-					To_String( Group_Entity_Type( Group ).User )  & "::" &
+					To_String( Group_Entity_Type( Group ).User_Identity )  & "::" &
 					To_String( Group_Entity_Type( Group ).Group )
 				);
 		return ID;
@@ -201,28 +201,78 @@ package body KOW_Sec.Authentication.Entities is
 
 	function Get_U_First_Name( Entity : in Entity_Type'Class ) return Unbounded_String is
 	begin
-			return To_Unbounded_String(
-						KOW_Sec.Get_First_Name(
-							User_Entity_Type( Entity ).User
-						)
-					);
+		return To_Unbounded_String(
+					KOW_Sec.Get_First_Name(
+						User_Entity_Type( Entity ).User
+					)
+				);
 	end Get_U_First_Name;
 	
 	--
 	-- last name
-	-- TODO: FROM HERE AND PASSWORD PROPERTY FOR THE USER ENTITY TYPE
 	--
-	procedure Set_U_Last_Name( User_Object
-			         procedure Set_Last_Name( User_Object: in out User; Last_Name: in String );
-				          function Get_Last_Name( User_Object: in User ) return String;
+	procedure Set_U_Last_Name( Entity : in out Entity_Type'Class; Last_Name : in Unbounded_String ) is
+	begin
+		KOW_Sec.Set_Last_Name(
+				User_Entity_Type( Entity ).User,
+				To_String( Last_Name )
+			);
+	end Set_U_Last_Name;
+
+	function Get_U_Last_Name( Entity : in Entity_Type'Class ) return Unbounded_String is
+	begin
+		return TO_Unbounded_String(
+				KOW_Sec.Get_Last_Name(
+						User_Entity_Type( Entity ).User
+					)
+				);
+	end Get_U_Last_Name;
 
 
+	--
+	-- Password
+	--
+	procedure Set_U_Password( Entity : in out Entity_Type'Class; Password : in Unbounded_String ) is
+	begin
+		User_Entity_Type( Entity ).Password := Password;
+	end Set_U_Password;
+
+	function Get_U_Password( Entity : in Entity_Type'Class ) return Unbounded_String is
+	begin
+		return User_Entity_Type( Entity ).Password;
+	end Get_U_Password;
 
 	-------------------------------------------------
 	-- Getter and Setter for the Group Entity Type --
 	-------------------------------------------------
 
-begin
+	--
+	-- Group
+	--
+	procedure Set_G_Group( Entity : in out Entity_Type'Class; Group : in Unbounded_String ) is
+	begin
+		Group_Entity_Type( Entity ).Group := KOW_Sec.Authorization_Group( Group );
+	end Set_G_Group;
+
+	function Get_G_Group( Entity : in Entity_Type'Class ) return Unbounded_String is
+	begin
+		return Unbounded_String( Group_Entity_Type( Entity ).Group );
+	end Get_G_Group;
+
+
+	--
+	-- User
+	--
+	procedure Set_G_User_Identity( Entity : in out Entity_Type'Class; User_Identity : in Unbounded_String ) is
+	begin
+		Group_Entity_Type( Entity ).User_Identity := User_Identity;
+	end Set_G_User_Identity;
+
+	function Get_G_User_Identity( Entity : in Entity_Type'Class ) return Unbounded_String is
+	begin
+		return Group_Entity_Type( Entity ).User_Identity;
+	end Get_G_User_Identity;
+
 	-- register the entities
 
 end KOW_Sec.Authentication.Entities;
