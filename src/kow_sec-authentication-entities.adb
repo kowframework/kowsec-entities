@@ -161,4 +161,68 @@ package body KOW_Sec.Authentication.Entities is
 		return The_Groups;
 	end Get_Groups;
 
+
+
+	------------------------------------------------
+	-- Getter and Setter for the User Entity Type --
+	------------------------------------------------
+
+
+
+	-- 
+	-- username
+	--
+	procedure Set_U_Username( Entity : in out Entity_Type'Class; Username : in Unbounded_String ) is
+	begin
+		KOW_Sec.Set_Username(
+				User_Entity_Type( Entity ).User,
+				To_String( Username )
+			);
+	end Set_U_Username;
+
+	function Get_U_Username( Entity : in Entity_Type'Class ) return Unbounded_String is
+	begin
+		return To_Unbounded_String(
+				KOW_Sec.Get_Username( User_Entity_Type( Entity ).User )
+			);
+	end Get_U_Username;
+	
+	
+	--
+	-- first name
+	--
+	procedure Set_U_First_Name( Entity : in out Entity_Type'Class; First_Name : in Unbounded_String ) is
+	begin
+		KOW_Sec.Set_First_Name(
+				User_Entity_Type( Entity ).User,
+				To_String( First_Name )
+			);
+	end Set_U_First_Name;
+
+	function Get_U_First_Name( Entity : in Entity_Type'Class ) return Unbounded_String is
+	begin
+			return To_Unbounded_String(
+						KOW_Sec.Get_First_Name(
+							User_Entity_Type( Entity ).User
+						)
+					);
+	end Get_U_First_Name;
+	
+	--
+	-- last name
+	-- TODO: FROM HERE AND PASSWORD PROPERTY FOR THE USER ENTITY TYPE
+	--
+	procedure Set_U_Last_Name( User_Object
+			         procedure Set_Last_Name( User_Object: in out User; Last_Name: in String );
+				          function Get_Last_Name( User_Object: in User ) return String;
+
+
+
+	-------------------------------------------------
+	-- Getter and Setter for the Group Entity Type --
+	-------------------------------------------------
+
+begin
+	-- register the entities
+
 end KOW_Sec.Authentication.Entities;
