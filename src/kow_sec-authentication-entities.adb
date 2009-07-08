@@ -13,7 +13,8 @@ with APQ;
 -------------------
 -- KOW Framework --
 -------------------
-with KOW_Ent;		use KOW_Ent;
+with KOW_Ent;			use KOW_Ent;
+with KOW_Ent.Properties;
 
 package body KOW_Sec.Authentication.Entities is
 
@@ -273,6 +274,78 @@ package body KOW_Sec.Authentication.Entities is
 		return Group_Entity_Type( Entity ).User_Identity;
 	end Get_G_User_Identity;
 
-	-- register the entities
+
+
+begin
+	---------------------------
+	-- register the entities --
+	---------------------------
+
+	--
+	-- User Entity
+	--
+	KOW_Ent.Entity_Registry.Register(
+			Entity_Tag	=> User_Entity_Type'Tag,
+			Table_Name	=> "kow_users",
+			Id_Generator	=> Generate_User_Id'Access
+		);
+	
+	KOW_Ent.Entity_Registry.Add_Property(
+			Entity_Tag	=> User_Entity_Type'Tag,
+			Property	=> KOW_Ent.Properties.New_UString_Property(
+						Column_Name	=> "username",
+						Getter		=> Get_U_Username'Access,
+						Setter		=> Set_U_Username'Access
+					)
+		);
+	KOW_Ent.Entity_Registry.Add_Property(
+			Entity_Tag	=> User_Entity_Type'Tag,
+			Property	=> KOW_Ent.Properties.New_UString_Property(
+						Column_Name	=> "first_name",
+						Getter		=> Get_U_First_Name'Access,
+						Setter		=> Set_U_First_Name'Access
+					)
+		);
+	KOW_Ent.Entity_Registry.Add_Property(
+			Entity_Tag	=> User_Entity_Type'Tag,
+			Property	=> KOW_Ent.Properties.New_UString_Property(
+						Column_Name	=> "last_name",
+						Getter		=> Get_U_Last_Name'Access,
+						Setter		=> Set_U_Last_Name'Access
+					)
+		);
+	KOW_Ent.Entity_Registry.Add_Property(
+			Entity_Tag	=> User_Entity_Type'Tag,
+			Property	=> KOW_Ent.Properties.New_Password_Property(
+						Column_Name	=> "password",
+						Getter		=> Get_U_Password'Access,
+						Setter		=> Set_U_Password'Access
+					)
+		);
+
+	-- group entity
+	KOW_Ent.Entity_Registry.Register(
+			Entity_Tag	=> Group_Entity_Type'Tag,
+			Table_Name	=> "kow_groups",
+			Id_Generator	=> Generate_Group_Id'Access
+		);
+	KOW_Ent.Entity_Registry.Add_Property(
+			Entity_Tag	=> Group_Entity_Type'Tag,
+			Property	=> KOW_Ent.Properties.New_UString_Property(
+						Column_Name	=> "user_identity",
+						Getter		=> Get_G_User_Identity'Access,
+						Setter		=> Set_G_User_Identity'Access
+					)
+		);
+	KOW_Ent.Entity_Registry.Add_Property(
+			Entity_Tag	=> Group_Entity_Type'Tag,
+			Property	=> KOW_Ent.Properties.New_UString_Property(
+						Column_Name	=> "group",
+						Getter		=> Get_G_Group'Access,
+						Setter		=> Set_G_Group'Access
+					)
+		);
+
+
 
 end KOW_Sec.Authentication.Entities;
