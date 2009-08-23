@@ -19,7 +19,7 @@ project KOWSec.Entities is
 	version := KOWLib.version;
 	prefix	:= $prefix;
 	
-	for Source_Dirs use ( prefix & "/include/kowsec-entities" ) ;
+	for Source_Dirs use ( $include_prefix );
 	
 	-- LIBRARY
 	for Library_Dir use prefix & "/lib";
