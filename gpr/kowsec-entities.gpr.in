@@ -16,13 +16,12 @@ with "kowsec";
 
 project KOWSec.Entities is
 
-	version := KOWLib.version;
-	prefix	:= $prefix;
+	version := $version;
 	
-	for Source_Dirs use ( $include_prefix );
+	for Source_Dirs use ( $include_path );
 	
 	-- LIBRARY
-	for Library_Dir use prefix & "/lib";
+	for Library_Dir use $lib_path;
 	for Library_Name use "kowsec-ent";
 	for Library_Kind use KOWLib'Library_Kind;
 	for Library_Version use "libkowsec-ent.so." & Version;
