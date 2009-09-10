@@ -32,22 +32,30 @@ package body KOW_Sec.Authentication.Entities is
 	-------------------
 	-- ID Generators --
 	-------------------
-	function Generate_User_Id( User : in KOW_Ent.Entity_Type'Class ) return KOW_Ent.Id_Type is
-		ID : KOW_Ent.Id_Type;
-	begin
-		ID.My_Tag := User'Tag;
-		ID.Value := Calculate_Hashed_Id( KOW_Sec.Identity( User_Entity_Type( User ).User ) );
-		return ID;
-	end Generate_User_Id;
-
-
-	function Generate_Group_Id( Group : in KOW_Ent.Entity_Type'Class ) return KOW_Ent.Id_Type is
-		ID : KOW_Ent.Id_Type;
-	begin
-		ID.My_Tag := Group'Tag;
-		ID.Value := Calculate_Hashed_Id( To_String( Group ) );
-		return ID;
-	end Generate_Group_Id;
+--
+--	As of 2009-09-10 we stoped using ID generators in this package.
+--
+--	The reasons for this are:
+--		1. the hash sometimes is greater than apq_bigserial'last
+--		2. if the string is long, it's likelly you'll have the same hash for them...
+--	Also, unicity can be (and should be) checked by your database backend.
+--
+--	function Generate_User_Id( User : in KOW_Ent.Entity_Type'Class ) return KOW_Ent.Id_Type is
+--		ID : KOW_Ent.Id_Type;
+--	begin
+--		ID.My_Tag := User'Tag;
+--		ID.Value := Calculate_Hashed_Id( KOW_Sec.Identity( User_Entity_Type( User ).User ) );
+--		return ID;
+--	end Generate_User_Id;
+--
+--
+--	function Generate_Group_Id( Group : in KOW_Ent.Entity_Type'Class ) return KOW_Ent.Id_Type is
+--		ID : KOW_Ent.Id_Type;
+--	begin
+--		ID.My_Tag := Group'Tag;
+--		ID.Value := Calculate_Hashed_Id( To_String( Group ) );
+--		return ID;
+--	end Generate_Group_Id;
 
 	----------------------
 	-- USER ENTITY TYPE --
@@ -75,7 +83,7 @@ package body KOW_Sec.Authentication.Entities is
 		Entity : User_Entity_Type;
 	begin
 		Entity.User := User;
-		Entity.Id := Generate_User_ID( Entity );
+		-- Entity.Id := Generate_User_ID( Entity );
 		return Entity;
 	end To_User_Entity;
 
@@ -298,7 +306,7 @@ begin
 	KOW_Ent.Entity_Registry.Register(
 			Entity_Tag	=> User_Entity_Type'Tag,
 			Table_Name	=> "kow_users",
-			Id_Generator	=> Generate_User_Id'Access,
+			Id_Generator	=> null,
 			Factory		=> User_Entity_Factory'Access
 		);
 	
@@ -339,7 +347,7 @@ begin
 	KOW_Ent.Entity_Registry.Register(
 			Entity_Tag	=> Group_Entity_Type'Tag,
 			Table_Name	=> "kow_groups",
-			Id_Generator	=> Generate_Group_Id'Access,
+			Id_Generator	=> null,
 			Factory		=> Group_Entity_Factory'Access
 		);
 	KOW_Ent.Entity_Registry.Add_Property(
