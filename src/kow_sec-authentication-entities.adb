@@ -242,6 +242,28 @@ package body KOW_Sec.Authentication.Entities is
 
 
 	--
+	-- email 
+	--
+	procedure Set_U_Email( Entity : in out Entity_Type'Class; Email : in Unbounded_String ) is
+	begin
+		KOW_Sec.Set_Email(
+				User_Entity_Type( Entity ).User,
+				To_String( Email )
+			);
+	end Set_U_Email;
+
+	function Get_U_Email( Entity : in Entity_Type'Class ) return Unbounded_String is
+	begin
+		return TO_Unbounded_String(
+				KOW_Sec.Get_Email(
+						User_Entity_Type( Entity ).User
+					)
+				);
+	end Get_U_Email;
+
+
+
+	--
 	-- Password
 	--
 	procedure Set_U_Password( Entity : in out Entity_Type'Class; Password : in Unbounded_String ) is
@@ -332,6 +354,14 @@ begin
 						Column_Name	=> "last_name",
 						Getter		=> Get_U_Last_Name'Access,
 						Setter		=> Set_U_Last_Name'Access
+					)
+		);
+	KOW_Ent.Entity_Registry.Add_Property(
+			Entity_Tag	=> User_Entity_Type'Tag,
+			Property	=> KOW_Ent.Properties.New_UString_Property(
+						Column_Name	=> "email",
+						Getter		=> Get_U_Email'Access,
+						Setter		=> Set_U_Email'Access
 					)
 		);
 	KOW_Ent.Entity_Registry.Add_Property(
