@@ -57,6 +57,15 @@ package body KOW_Sec.Authentication.Entities is
 --		return ID;
 --	end Generate_Group_Id;
 
+
+
+	overriding
+	function To_Access( User : in User_Type ) return KOW_Sec.User_Access is
+	begin
+		return new User_Type'( User );
+	end To_Access;
+
+
 	----------------------
 	-- USER ENTITY TYPE --
 	----------------------
@@ -91,7 +100,7 @@ package body KOW_Sec.Authentication.Entities is
 		-- convert the entity to an KOW_sec.user type
 		User : User_Type := Entity.User;
 	begin
-		User.ID := Entity.ID;
+		User.ID		:= Entity.ID;
 		return User;
 	end To_User;
 

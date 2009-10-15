@@ -24,8 +24,12 @@ package KOW_Sec.Authentication.Entities is
 	---------------
 
 	type User_Type is new KOW_Sec.User with record
-		ID	: KOW_Ent.ID_Type;
+		ID		: KOW_Ent.ID_Type;
 	end record;
+
+
+	overriding
+	function To_Access( User : in User_Type ) return KOW_Sec.User_Access;
 
 
 	----------------------
