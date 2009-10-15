@@ -33,6 +33,16 @@ package KOW_Sec.Authentication.Entities is
 	function To_String( Entity : in User_Entity_Type ) return String;
 	-- return the user identity
 
+
+	overriding
+	function Describe( Entity : in User_Entity_Type ) return String;
+	-- return the full name of the user
+	
+	overriding
+	function Image_URL( Entity : in User_Entity_Type ) return String;
+	-- get the gravatar for the given user
+
+
 	
 	function To_User( Entity : in User_Entity_Type ) return KOW_Sec.User;
 	-- convert the entity to an KOW_sec.user type
@@ -54,7 +64,17 @@ package KOW_Sec.Authentication.Entities is
 
 	overriding
 	function To_String( Entity : in Group_Entity_Type ) return String;
-	-- return the group name
+	-- return the user identity for this group 
+
+	overriding
+	function Describe( Entity : in Group_Entity_Type ) return String;
+	-- return the group name...
+	
+
+	--overriding
+	--TODO :: function Image_URL( Entity : in Group_Entity_Type ) return String;
+	-- get the gravatar URL for the related user
+
 
 	-------------------------------
 	-- AUTHENTICATION MANAGEMENT --
