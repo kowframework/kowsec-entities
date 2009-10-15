@@ -66,7 +66,7 @@ package body KOW_Sec.Authentication.Entities is
 	function To_String( Entity : in User_Entity_Type ) return String is
 		-- return the user identity
 	begin
-		return KOW_Sec.Identity( Entity.User );
+		return Identity( Entity.User );
 	end To_String;
 
 
@@ -87,19 +87,22 @@ package body KOW_Sec.Authentication.Entities is
 
 
 	
-	function To_User( Entity : in User_Entity_Type ) return KOW_Sec.User is
+	function To_User( Entity : in User_Entity_Type ) return User_Type'Class is
 		-- convert the entity to an KOW_sec.user type
+		User : User_Type := Entity.User;
 	begin
-		return Entity.User;
+		User.ID := Entity.ID;
+		return User;
 	end To_User;
 
 
-	function To_User_Entity( User : in KOW_Sec.User ) return User_Entity_Type is
+	function To_User_Entity( User : in User_Type ) return User_Entity_Type'Class is
 		-- convert the user type to an user entity type
 		-- assumes the user is already in the database.
 		Entity : User_Entity_Type;
 	begin
 		Entity.User := User;
+		Entity.ID := User.ID;
 		-- Entity.Id := Generate_User_ID( Entity );
 		return Entity;
 	end To_User_Entity;
@@ -210,7 +213,7 @@ package body KOW_Sec.Authentication.Entities is
 	--
 	procedure Set_U_Username( Entity : in out Entity_Type'Class; Username : in Unbounded_String ) is
 	begin
-		KOW_Sec.Set_Username(
+		Set_Username(
 				User_Entity_Type( Entity ).User,
 				To_String( Username )
 			);
@@ -219,7 +222,7 @@ package body KOW_Sec.Authentication.Entities is
 	function Get_U_Username( Entity : in Entity_Type'Class ) return Unbounded_String is
 	begin
 		return To_Unbounded_String(
-				KOW_Sec.Get_Username( User_Entity_Type( Entity ).User )
+				Get_Username( User_Entity_Type( Entity ).User )
 			);
 	end Get_U_Username;
 	
@@ -229,7 +232,7 @@ package body KOW_Sec.Authentication.Entities is
 	--
 	procedure Set_U_First_Name( Entity : in out Entity_Type'Class; First_Name : in Unbounded_String ) is
 	begin
-		KOW_Sec.Set_First_Name(
+		Set_First_Name(
 				User_Entity_Type( Entity ).User,
 				To_String( First_Name )
 			);
@@ -238,7 +241,7 @@ package body KOW_Sec.Authentication.Entities is
 	function Get_U_First_Name( Entity : in Entity_Type'Class ) return Unbounded_String is
 	begin
 		return To_Unbounded_String(
-					KOW_Sec.Get_First_Name(
+					Get_First_Name(
 						User_Entity_Type( Entity ).User
 					)
 				);
@@ -249,7 +252,7 @@ package body KOW_Sec.Authentication.Entities is
 	--
 	procedure Set_U_Last_Name( Entity : in out Entity_Type'Class; Last_Name : in Unbounded_String ) is
 	begin
-		KOW_Sec.Set_Last_Name(
+		Set_Last_Name(
 				User_Entity_Type( Entity ).User,
 				To_String( Last_Name )
 			);
@@ -258,7 +261,7 @@ package body KOW_Sec.Authentication.Entities is
 	function Get_U_Last_Name( Entity : in Entity_Type'Class ) return Unbounded_String is
 	begin
 		return TO_Unbounded_String(
-				KOW_Sec.Get_Last_Name(
+				Get_Last_Name(
 						User_Entity_Type( Entity ).User
 					)
 				);
@@ -270,7 +273,7 @@ package body KOW_Sec.Authentication.Entities is
 	--
 	procedure Set_U_Email( Entity : in out Entity_Type'Class; Email : in Unbounded_String ) is
 	begin
-		KOW_Sec.Set_Email(
+		Set_Email(
 				User_Entity_Type( Entity ).User,
 				To_String( Email )
 			);
@@ -279,7 +282,7 @@ package body KOW_Sec.Authentication.Entities is
 	function Get_U_Email( Entity : in Entity_Type'Class ) return Unbounded_String is
 	begin
 		return TO_Unbounded_String(
-				KOW_Sec.Get_Email(
+				Get_Email(
 						User_Entity_Type( Entity ).User
 					)
 				);

@@ -18,6 +18,16 @@ with KOW_Sec;
 package KOW_Sec.Authentication.Entities is
 
 
+
+	---------------
+	-- USER TYPE --
+	---------------
+
+	type User_Type is new KOW_Sec.User with record
+		ID	: KOW_Ent.ID_Type;
+	end record;
+
+
 	----------------------
 	-- USER ENTITY TYPE --
 	----------------------
@@ -44,10 +54,10 @@ package KOW_Sec.Authentication.Entities is
 
 
 	
-	function To_User( Entity : in User_Entity_Type ) return KOW_Sec.User;
+	function To_User( Entity : in User_Entity_Type ) return User_Type'Class;
 	-- convert the entity to an KOW_sec.user type
 
-	function To_User_Entity( User : in KOW_Sec.User ) return User_Entity_Type;
+	function To_User_Entity( User : in User_Type ) return User_Entity_Type'Class;
 	-- convert the user type to an user entity type
 	-- assumes the user is already in the database.
 
@@ -110,7 +120,7 @@ package KOW_Sec.Authentication.Entities is
 
 private
 	type User_Entity_Type is new KOW_Ent.Entity_Type with record
-		User : KOW_Sec.User;
+		User : User_Type;
 		-- there is no really need to duplicate all the parameters in here
 		-- instead, we have a nested user
 
