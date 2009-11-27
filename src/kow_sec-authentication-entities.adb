@@ -422,7 +422,8 @@ begin
 			Property	=> KOW_Ent.Properties.New_UString_Property(
 						Column_Name	=> "user_identity",
 						Getter		=> Get_G_User_Identity'Access,
-						Setter		=> Set_G_User_Identity'Access
+						Setter		=> Set_G_User_Identity'Access,
+						Immutable	=> True
 					)
 		);
 	KOW_Ent.Entity_Registry.Add_Property(
@@ -430,7 +431,8 @@ begin
 			Property	=> KOW_Ent.Properties.New_UString_Property(
 						Column_Name	=> "group_name",
 						Getter		=> Get_G_Group'Access,
-						Setter		=> Set_G_Group'Access
+						Setter		=> Set_G_Group'Access,
+						Immutable	=> True
 					)
 		);
 
