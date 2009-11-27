@@ -373,7 +373,8 @@ begin
 			Property	=> KOW_Ent.Properties.New_UString_Property(
 						Column_Name	=> "username",
 						Getter		=> Get_U_Username'Access,
-						Setter		=> Set_U_Username'Access
+						Setter		=> Set_U_Username'Access,
+						Immutable	=> True
 					)
 		);
 	KOW_Ent.Entity_Registry.Add_Property(
