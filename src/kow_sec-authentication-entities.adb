@@ -410,7 +410,8 @@ begin
 						Getter		=> Get_U_Username'Access,
 						Setter		=> Set_U_Username'Access,
 						Immutable	=> True
-					)
+					),
+			Is_Unique	=> True
 		);
 	KOW_Ent.Entity_Registry.Add_Property(
 			Entity_Tag	=> User_Entity_Type'Tag,
