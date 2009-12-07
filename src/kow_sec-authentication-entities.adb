@@ -205,6 +205,41 @@ package body KOW_Sec.Authentication.Entities is
 
 
 
+
+	------------------------------
+	-- User Creation Procedures --
+	------------------------------
+
+	procedure New_User(
+				Username	: in String;
+				Password	: in String
+				) is
+		-- create a new user and store it in the database backend
+		The_User : User_Entity_Type;
+	begin
+		The_User.User.Username := To_Unbounded_String( Username );
+		The_User.Password := To_Unbounded_String( Password );
+
+		Store( The_User );
+	end New_User;
+		
+
+	procedure Add_Group(
+				User_Identity	: in String;
+				Group		: in String
+			) is
+		-- add the given user to the given group
+		The_Group : Group_Entity_Type;
+	begin
+		The_Group.User_Identity := To_Unbounded_String( User_Identity );
+		The_Group.Group := To_Unbounded_String( Group );
+
+
+		Store( The_Group );
+	end Add_Group;
+
+
+
 	------------------------------------------------
 	-- Getter and Setter for the User Entity Type --
 	------------------------------------------------

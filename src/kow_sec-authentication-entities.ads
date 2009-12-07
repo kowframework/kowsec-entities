@@ -122,6 +122,23 @@ package KOW_Sec.Authentication.Entities is
 
 
 
+	------------------------------
+	-- User Creation Procedures --
+	------------------------------
+
+	procedure New_User(
+				Username	: in String;
+				Password	: in String
+				);
+	-- create a new user and store it in the database backend
+	
+
+	procedure Add_Group(
+				User_Identity	: in String;
+				Group		: in String
+			);
+	-- add the given user to the given group
+
 private
 	type User_Entity_Type is new KOW_Ent.Entity_Type with record
 		User : User_Type;
