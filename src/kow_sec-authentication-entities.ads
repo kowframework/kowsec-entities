@@ -111,6 +111,7 @@ package KOW_Sec.Authentication.Entities is
 	-- It's this way so the authentication method might have
 	-- a user with extended properties.
 
+	function Get_User( Manager : in Authentication_Manager; Username : in String ) return User'Class;
 
 
 	function Get_Groups(	Manager:	in Authentication_Manager;

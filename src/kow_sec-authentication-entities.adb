@@ -174,6 +174,24 @@ package body KOW_Sec.Authentication.Entities is
 	end Do_Login;
 
 
+	function Get_User( Manager : in Authentication_Manager; Username : in String ) return User'Class is
+		use User_Query_Builders;
+		Q : Query_Type;
+	begin
+		Append(
+				Q		=> Q,
+				Column		=> "username",
+				Value		=> Username,
+				Appender	=> Appender_AND,
+				Operator	=> Operator_Equals
+			);
+		return To_User( Get_First( Q => Q, Unique => True ) );
+	exception
+		when NO_ENTITY =>
+			raise KOW_Sec.UNKNOWN_USER with Username;
+	end Get_User;
+
+
 	function Get_Groups(	Manager:	in Authentication_Manager;
 				User_Object:	in User'Class )
 				return Authorization_Groups is
