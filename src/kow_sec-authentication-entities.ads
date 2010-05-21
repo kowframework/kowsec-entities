@@ -36,13 +36,22 @@ package KOW_Sec.Authentication.Entities is
 	-- USER ENTITY TYPE --
 	----------------------
 
-	type User_Entity_Type is new KOW_Ent.Entity_Type with private;
-	-- This represents the user data in the data base
-	-- The ID for this entity is the Hash code for the username
-	--
-	-- This is how we make sure each user name is unique.
+	type User_Entity_Type is new KOW_Ent.Entity_Type with record
+		-- This represents the user data in the data base
+		-- The ID for this entity is the Hash code for the username
+		--
+		-- This is how we make sure each user name is unique.
 
 
+		User : User_Type;
+		-- there is no really need to duplicate all the parameters in here
+		-- instead, we have a nested user
+
+		Password : Unbounded_String;
+		-- well, we need some place to store user's password, don't we?
+	end record;
+
+	
 	overriding
 	function To_String( Entity : in User_Entity_Type ) return String;
 	-- return the user identity
@@ -66,15 +75,20 @@ package KOW_Sec.Authentication.Entities is
 	-- assumes the user is already in the database.
 
 
+	package User_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => User_Entity_Type );
 
 	------------------
 	-- Group Entity --
 	------------------
 	
-	type Group_Entity_Type is new KOW_Ent.Entity_Type with private;
-	-- represents an authorization group in the database
-	-- note that it's not related to the Entity_Type class
-	-- This is to be compatible with the main KOW_Sec's specification
+	type Group_Entity_Type is new KOW_Ent.Entity_Type with record
+		-- represents an authorization group in the database
+		-- note that it's not related to the Entity_Type class
+		-- This is to be compatible with the main KOW_Sec's specification
+		Group		: KOW_Sec.Authorization_Group;
+		User_Identity	: Unbounded_String;
+	end record;
+
 
 	overriding
 	function To_String( Entity : in Group_Entity_Type ) return String;
@@ -89,12 +103,14 @@ package KOW_Sec.Authentication.Entities is
 	--TODO :: function Image_URL( Entity : in Group_Entity_Type ) return String;
 	-- get the gravatar URL for the related user
 
+	package Group_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => Group_Entity_Type );
 
 	-------------------------------
 	-- AUTHENTICATION MANAGEMENT --
 	-------------------------------
 
-	type Authentication_Manager is new KOW_Sec.Authentication_Manager with private;
+	type Authentication_Manager is new KOW_Sec.Authentication_Manager with null record;
+
 	-- This is where the magic happens!
 	--
 	-- The Authentication_Manager type is the type that should be extended
@@ -140,23 +156,5 @@ package KOW_Sec.Authentication.Entities is
 			);
 	-- add the given user to the given group
 
-private
-	type User_Entity_Type is new KOW_Ent.Entity_Type with record
-		User : User_Type;
-		-- there is no really need to duplicate all the parameters in here
-		-- instead, we have a nested user
-
-		Password : Unbounded_String;
-		-- well, we need some place to store user's password, don't we?
-	end record;
-	package User_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => User_Entity_Type );
-	
-	type Group_Entity_Type is new KOW_Ent.Entity_Type with record
-		Group		: KOW_Sec.Authorization_Group;
-		User_Identity	: Unbounded_String;
-	end record;
-	package Group_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => Group_Entity_Type );
-
-	type Authentication_Manager is new KOW_Sec.Authentication_Manager with null record;
 
 end KOW_Sec.Authentication.Entities;
