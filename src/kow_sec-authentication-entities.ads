@@ -74,6 +74,8 @@ package KOW_Sec.Authentication.Entities is
 	-- convert the user type to an user entity type
 	-- assumes the user is already in the database.
 
+	function Get_user_Entity( Username: in String ) return User_Entity_Type;
+	-- get the user entity by it's username
 
 	package User_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => User_Entity_Type );
 
