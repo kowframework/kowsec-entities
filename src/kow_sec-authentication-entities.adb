@@ -1,5 +1,8 @@
 
-with Ada.Containers;
+--------------
+-- Ada 2005 --
+--------------
+with Ada.Strings.Hash;
 
 ---------
 -- APQ --
@@ -18,29 +21,11 @@ package body KOW_Sec.Authentication.Entities is
 	----------------------
 	-- Auxiliar Methods --
 	----------------------
-	function Hash (Key : String) return Ada.Containers.Hash_Type is
-	   use Ada.Containers;
-
-	   function Rotate_Left
-	     (Value  : Hash_Type;
-	      Amount : Natural) return Hash_Type;
-	   pragma Import (Intrinsic, Rotate_Left);
-
-	   Tmp : Hash_Type;
-
-	begin
-	   Tmp := 0;
-	   for J in Key'Range loop
-	      Tmp := Rotate_Left (Tmp, 3) + Character'Pos (Key (J));
-	   end loop;
-
-	   return Tmp;
-	end Hash;
 
 
 	function Calculate_Hashed_ID( Str_ID : in String ) return APQ.APQ_Bigserial is
 	begin
-		return APQ.APQ_Bigserial( Hash( Str_Id ) );
+		return APQ.APQ_Bigserial( Ada.Strings.Hash( Str_Id ) );
 	end Calculate_Hashed_ID;
 
 
