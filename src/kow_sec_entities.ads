@@ -15,7 +15,7 @@ with KOW_Ent.Query_Builders;
 with KOW_Sec;				use KOW_Sec;
 
 
-package KOW_Sec.Authentication.Entities is
+package KOW_Sec_Entities is
 
 
 	----------------------
@@ -88,7 +88,16 @@ package KOW_Sec.Authentication.Entities is
 			) return Boolean;
 	-- check if the user is registered into this manager
 
+	------------------------------
+	-- User Creation Procedures --
+	------------------------------
+
+	function New_User(
+				Username	: in String;
+				Password	: in String
+			) return User_Identity_Type;
+	-- create a new user, saving it and then returning it's identity
 
 
 
-end KOW_Sec.Authentication.Entities;
+end KOW_Sec_Entities;
