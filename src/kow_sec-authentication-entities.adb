@@ -159,13 +159,25 @@ package body KOW_Sec.Authentication.Entities is
 	-- AUTHENTICATION MANAGEMENT --
 	-------------------------------
 
-	function Do_Login(	Manager:  in Authentication_Manager;
+
+	function Do_Login(
+				Manager	: in Authentication_Manager_Type;
 				Username: in String;
-				Password: in String ) return User'Class is
-		-- Login the user, returning a object representing it.
-		-- This object might be a direct instance of User or a subclass.
-		-- It's this way so the authentication method might have
-		-- a user with extended properties.
+				Password: in String
+			) return User_Identity_Type;
+	-- Login the user, returning a object representing it.
+	-- This object might be a direct instance of User or a subclass.
+	-- It's this way so the authentication method might have
+	-- a user with extended properties.
+
+
+
+
+	function Do_Login(
+				Manager	: in Authentication_Manager_Type;
+				Username: in String;
+				Password: in String
+			) return User_Identity_Type is
 		use User_Query_Builders;
 
 		Q : Query_Type;
@@ -185,11 +197,38 @@ package body KOW_Sec.Authentication.Entities is
 				Appender	=> Appender_AND,
 				Operator	=> Operator_Equals
 			);
-		return To_User( Get_First( Q => Q, Unique => True ) );
+		return Get_First( Q => Q, Unique => True ).User_Identity;
 	exception
 		when NO_ENTITY =>
 			raise KOW_Sec.INVALID_CREDENTIALS with "Login for the user """ & Username & """ failed!";
 	end Do_Login;
+
+	function Has_User(
+				Manager		: Authentication_Manager_Type;
+				User_Identity	: User_Identity_Type
+			) return Boolean is
+		-- check if the user is registered into this manager
+		use User_Query_Builders;
+
+		Q : Query_Type;
+		U : User_Entity_Type;
+	begin
+		Append(
+				Q		=> Q,
+				Column		=> "user_identity",
+				Value		=> User_Identity,
+				Appender	=> Appender_AND,
+				Operator	=> Operator_Equals
+			);
+
+		U := Get_First( Q => Q, Unique => True );
+
+		return True;
+	exception
+		when NO_ENTITY =>
+			return false;
+	end Has_User;
+
 
 
 	function Get_User( Manager : in Authentication_Manager; Username : in String ) return User'Class is
