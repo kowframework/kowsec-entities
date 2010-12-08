@@ -134,6 +134,12 @@ package body KOW_Sec.Entities is
 	-------------------------------
 
 
+	function Get_Name( Manager : in Authentication_Manager_Type ) return String is
+	begin
+		return "ENTITY";
+	end Get_Name;
+
+
 	function Do_Login(
 				Manager	: in Authentication_Manager_Type;
 				Username: in String;

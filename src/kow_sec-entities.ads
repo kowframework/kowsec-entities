@@ -71,6 +71,9 @@ package KOW_Sec.Entities is
 	-- It's a controlled type only for the pleasure of the type implementor.
 
 
+	function Get_Name( Manager : in Authentication_Manager_Type ) return String;
+	-- return ENTITY
+
 	function Do_Login(
 				Manager	: in Authentication_Manager_Type;
 				Username: in String;
