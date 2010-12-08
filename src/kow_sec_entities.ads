@@ -15,7 +15,7 @@ with KOW_Ent.Query_Builders;
 with KOW_Sec;				use KOW_Sec;
 
 
-package KOW_Sec.Entities is
+package KOW_Sec_Entities is
 
 
 	----------------------
@@ -103,4 +103,4 @@ package KOW_Sec.Entities is
 
 
 
-end KOW_Sec.Entities;
+end KOW_Sec_Entities;
