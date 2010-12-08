@@ -45,10 +45,10 @@ package KOW_Sec.Entities is
 
 
 	
-	function To_User( Entity : in User_Entity_Type ) return User_Type;
+	function To_User_Data( Entity : in User_Entity_Type ) return User_Data_Type;
 	-- convert the entity to an KOW_sec.user type
 
-	function To_User_Entity( User : in User_Type ) return User_Entity_Type;
+	function To_User_Entity( User : in User_Data_Type ) return User_Entity_Type;
 	-- convert the user type to an user entity type
 	-- assumes the user is already in the database.
 
