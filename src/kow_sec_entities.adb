@@ -247,6 +247,8 @@ package body KOW_Sec_Entities is
 		Entity.Password := To_Unbounded_String( Password );
 
 		Store( Entity );
+		-- if the username is duplicated, an exception will be raised right here :)
+		-- so.... the user won't be saved at all
 
 
 		Data.Identity := Entity.User_Identity;
