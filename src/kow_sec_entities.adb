@@ -239,15 +239,20 @@ package body KOW_Sec_Entities is
 				Password	: in String
 			) return User_Identity_Type is
 		-- create a new user and store it in the database backend
-		The_User : User_Entity_Type;
+		Entity	: User_Entity_Type;
+		Data	: KOW_Sec.User_Data_Type;
 	begin
-		The_User.User_Identity := KOW_Sec.New_User_Identity;
-		The_User.Username := To_Unbounded_String( Username );
-		The_User.Password := To_Unbounded_String( Password );
+		Entity.User_Identity	:= KOW_Sec.New_User_Identity;
+		Entity.Username := To_Unbounded_String( Username );
+		Entity.Password := To_Unbounded_String( Password );
 
-		Store( The_User );
+		Store( Entity );
 
-		return The_User.User_Identity;
+
+		Data.Identity := Entity.User_Identity;
+		KOW_Sec.Store_User( Data );
+
+		return Entity.User_Identity;
 	end New_User;
 		
 
