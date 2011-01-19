@@ -47,7 +47,7 @@ with APQ;
 with KOW_Ent;			use KOW_Ent;
 with KOW_Ent.Properties;
 
-package body KOW_Sec_Entities is
+package body KOW_Sec.Entities is
 
 
 	----------------------
@@ -364,4 +364,4 @@ begin
 			Is_Unique	=> True
 		);
 
-end KOW_Sec_Entities;
+end KOW_Sec.Entities;
