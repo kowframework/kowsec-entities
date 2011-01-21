@@ -29,11 +29,10 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-
-
 --------------
 -- Ada 2005 --
 --------------
+with Ada.Exceptions;
 with Ada.Strings.Hash;
 
 ---------
@@ -180,6 +179,7 @@ package body KOW_Sec.Entities is
 		use User_Query_Builders;
 
 		Q : Query_Type;
+		E : User_Entity_Type;
 	begin
 		Append(
 				Q		=> Q,
@@ -196,10 +196,15 @@ package body KOW_Sec.Entities is
 				Appender	=> Appender_AND,
 				Operator	=> Operator_Equals
 			);
-		return Get_First( Q => Q, Unique => True ).User_Identity;
+		E := Get_First( Q => Q, Unique => True );
+
+
+		return E.User_Identity;
 	exception
 		when NO_ENTITY =>
 			raise KOW_Sec.INVALID_CREDENTIALS with "Login for the user """ & Username & """ failed!";
+		when e : others =>
+			Ada.Exceptions.Reraise_Occurrence( e );
 	end Do_Login;
 
 	function Has_User(
@@ -277,10 +282,7 @@ package body KOW_Sec.Entities is
 	procedure Set_U_Identity( Entity : in out Entity_Type'Class; Identity : in Unbounded_String ) is
 		Id : String := To_String( Identity );
 	begin
-		User_Entity_Type( Entity ).User_Identity( 1 .. Id'Length ) := User_Identity_Type( Id );
-		if Id'Length < 32 then
-			User_Entity_Type( Entity ).User_Identity( Id'Length + 1 .. 32 ) := ( Id'Length+1 .. 32 => ' ' );
-		end if;
+		User_Entity_Type( Entity ).User_Identity := User_Identity_Type( id );
 	end Set_U_Identity;
 
 	function Get_U_Identity( Entity : in Entity_Type'Class ) return Unbounded_String is
