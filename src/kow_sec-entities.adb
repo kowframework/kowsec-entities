@@ -241,7 +241,8 @@ package body KOW_Sec.Entities is
 
 	function New_User(
 				Username	: in String;
-				Password	: in String
+				Password	: in String;
+				Account_Status	: in KOW_Sec.Account_Status_Type := KOW_Sec.Account_Enabled
 			) return User_Identity_Type is
 		-- create a new user and store it in the database backend
 		Entity	: User_Entity_Type;
@@ -257,6 +258,7 @@ package body KOW_Sec.Entities is
 
 
 		Data.Identity := Entity.User_Identity;
+		Data.Account_Status := Account_Status;
 		KOW_Sec.Store_User( Data );
 
 		return Entity.User_Identity;

@@ -133,7 +133,8 @@ package KOW_Sec.Entities is
 
 	function New_User(
 				Username	: in String;
-				Password	: in String
+				Password	: in String;
+				Account_Status	: in KOW_Sec.Account_Status_Type := KOW_Sec.Account_Enabled
 			) return User_Identity_Type;
 	-- create a new user, saving it and then returning it's identity
 
