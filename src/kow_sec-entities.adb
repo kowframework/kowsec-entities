@@ -265,6 +265,103 @@ package body KOW_Sec.Entities is
 	end New_User;
 		
 
+
+
+
+	---------------------------------
+	-- USER IDENTITY PROPERTY TYPE --
+	---------------------------------
+
+
+	procedure Set_Property(	
+				Property	: in     User_Identity_Property_Type;		-- the property worker
+				Entity		: in out Entity_Type'Class;		-- the entity
+				Q		: in out APQ.Root_Query_Type'Class;	-- the query from witch to fetch the result
+				Connection	: in out APQ.Root_Connection_type'Class		-- the connection that belongs the query
+			) is
+		-- Set the property into the Entity.
+
+		Column : String := To_String( Property.Column_Name );
+		Index  : APQ.Column_Index_Type := APQ.Column_Index( Q, Column );
+		Value  : String := APQ.Value( Q, Index );
+	begin
+		Property.Setter.all(
+				Entity,
+				To_Identity( Value )
+			);
+	exception
+		when APQ.Null_Value =>
+			Property.Setter.all(
+				Entity,
+				Property.Default_Value
+			);
+	end Set_Property;
+
+	procedure Get_Property(
+				Property	: in     User_Identity_Property_Type;		-- the property worker
+				Entity		: in     Entity_Type'Class;		-- the entity
+				Query		: in out APQ.Root_Query_Type'Class;	-- the query to witch append the value to insert
+				Connection	: in out APQ.Root_Connection_type'Class		-- the connection that belongs the query
+			) is
+	begin
+		APQ.Append_Quoted( Query, Connection, To_String( Property.Getter.All( Entity ) ) );
+	end Get_Property;
+
+	overriding
+	procedure Set_Property(
+				Property	: in     User_Identity_Property_Type;		-- the property worker
+				Entity		: in out Entity_Type'Class;		-- the entity
+				Value		: in     String				-- the String representation of this value
+			) is
+		-- Set the property from a String representation of the value
+	begin
+		Property.Setter.all( Entity, To_Identity( Value ) );
+	end Set_Property;
+	
+	overriding
+	function Get_Property(
+				Property	: in     User_Identity_Property_Type;		-- the property worker
+				Entity		: in     Entity_Type'Class		-- the entity
+			) return String is
+	begin
+		return To_String( Property.Getter.all( Entity ) );
+	end Get_Property;
+
+
+	overriding
+	procedure Append_Create_Table( Property : in User_Identity_Property_Type; Query : in out APQ.Root_Query_Type'Class ) is
+	begin
+		APQ.Append(
+				Query,
+				To_String( Property.Column_Name ) &
+						" VARCHAR( 32 ) NOT NULL"
+			);
+	end Append_Create_Table;
+
+
+
+	function New_User_Identity_Property(
+				Column_Name	: in     String;
+				Getter		: User_Identity_Getter_Callback;
+				Setter		: User_Identity_Setter_Callback;
+				Default_Value	: in     User_Identity_Type := Anonymous_User_Identity;
+				Immutable	: in     Boolean := False
+			) return Entity_Property_Ptr is
+		-- used to assist the creation of User_Identity properties.
+		UId : User_Identity_Property_Type;
+	begin
+		UId.Column_Name	:= To_Unbounded_String( Column_Name );
+		UId.Getter		:= Getter;
+		UId.Setter		:= Setter;
+		UId.Default_Value	:= Default_Value;
+		UId.Immutable		:= Immutable;
+		return new User_Identity_Property_Type'( UId );
+	end New_User_Identity_Property;
+
+
+
+
+
 	------------------------------------------------
 	-- Getter and Setter for the User Entity Type --
 	------------------------------------------------
@@ -281,15 +378,14 @@ package body KOW_Sec.Entities is
 	--
 	-- identity
 	--
-	procedure Set_U_Identity( Entity : in out Entity_Type'Class; Identity : in Unbounded_String ) is
-		Id : String := To_String( Identity );
+	procedure Set_U_Identity( Entity : in out Entity_Type'Class; Identity : in User_Identity_type ) is
 	begin
-		User_Entity_Type( Entity ).User_Identity := User_Identity_Type( id );
+		User_Entity_Type( Entity ).User_Identity := Identity;
 	end Set_U_Identity;
 
-	function Get_U_Identity( Entity : in Entity_Type'Class ) return Unbounded_String is
+	function Get_U_Identity( Entity : in Entity_Type'Class ) return User_Identity_Type is
 	begin
-		return To_Unbounded_String( String( User_Entity_Type( Entity ).User_Identity ) );
+		return User_Entity_Type( Entity ).User_Identity;
 	end Get_U_Identity;
 	
 
@@ -360,7 +456,7 @@ begin
 		);
 	KOW_Ent.Entity_Registry.Add_Property(
 			Entity_Tag	=> User_Entity_Type'Tag,
-			Property	=> KOW_Ent.Properties.New_UString_Property(
+			Property	=> New_User_Identity_Property(
 						Column_Name	=> "user_identity",
 						Getter		=> Get_U_Identity'Access,
 						Setter		=> Set_U_Identity'Access

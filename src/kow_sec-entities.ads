@@ -46,12 +46,14 @@ with Ada.Strings.Unbounded;		use Ada.Strings.Unbounded;
 -------------------
 -- KOW Framework --
 -------------------
-with KOW_Ent;
+with KOW_Ent;				use KOW_Ent;
 with KOW_Ent.Query_Builders;
 with KOW_Sec;				use KOW_Sec;
 
+with APQ;
 
 package KOW_Sec.Entities is
+
 
 
 	----------------------
@@ -139,5 +141,67 @@ package KOW_Sec.Entities is
 	-- create a new user, saving it and then returning it's identity
 
 
+
+	---------------------------------
+	-- USER IDENTITY PROPERTY TYPE --
+	---------------------------------
+
+	type User_Identity_Getter_Callback is access function( Entity : in KOW_Ent.Entity_Type'Class ) return User_Identity_Type;
+	type User_Identity_Setter_Callback is access procedure( Entity : in out KOW_Ent.Entity_Type'Class; Value : in User_Identity_Type );
+
+	type User_Identity_Property_Type is new KOW_Ent.Entity_Property_Type with record
+		Getter		: User_Identity_Getter_Callback;
+		Setter		: User_Identity_Setter_Callback;
+		Default_Value	: User_Identity_Type;
+	end record;
+
+
+	overriding
+	procedure Set_Property(	
+				Property	: in     User_Identity_Property_Type;		-- the property worker
+				Entity		: in out Entity_Type'Class;		-- the entity
+				Q		: in out APQ.Root_Query_Type'Class;	-- the query from witch to fetch the result
+				Connection	: in out APQ.Root_Connection_type'Class		-- the connection that belongs the query
+			);
+	-- Set the property into the Entity.
+
+	overriding
+	procedure Get_Property(
+				Property	: in     User_Identity_Property_Type;		-- the property worker
+				Entity		: in     Entity_Type'Class;		-- the entity
+				Query		: in out APQ.Root_Query_Type'Class;	-- the query to witch append the value to insert
+				Connection	: in out APQ.Root_Connection_type'Class		-- the connection that belongs the query
+			);
+
+
+
+	overriding
+	procedure Set_Property(
+				Property	: in     User_Identity_Property_Type;		-- the property worker
+				Entity		: in out Entity_Type'Class;		-- the entity
+				Value		: in     String				-- the String representation of this value
+			);
+	-- Set the property from a String representation of the value
+	
+	overriding
+	function Get_Property(
+				Property	: in     User_Identity_Property_Type;		-- the property worker
+				Entity		: in     Entity_Type'Class		-- the entity
+			) return String;
+
+
+	overriding
+	procedure Append_Create_Table( Property : in User_Identity_Property_Type; Query : in out APQ.Root_Query_Type'Class );
+
+
+	function New_User_Identity_Property(
+				Column_Name	: in     String;
+				Getter		: User_Identity_Getter_Callback;
+				Setter		: User_Identity_Setter_Callback;
+				Default_Value	: in     User_Identity_Type := Anonymous_User_Identity;
+				Immutable	: in     Boolean := False
+			) return Entity_Property_Ptr;
+	-- used to assist the creation of User_Identity properties.
+	-- default_value represents the value to be set when the one retoner from database is NULL
 
 end KOW_Sec.Entities;
