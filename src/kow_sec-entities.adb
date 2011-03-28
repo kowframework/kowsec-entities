@@ -33,7 +33,10 @@
 -- Ada 2005 --
 --------------
 with Ada.Exceptions;
+with Ada.Strings;
+with Ada.Strings.Fixed;
 with Ada.Strings.Hash;
+with Ada.Tags;
 
 ---------
 -- APQ --
@@ -48,6 +51,29 @@ with KOW_Ent.Properties;
 
 package body KOW_Sec.Entities is
 
+
+	----------------------
+	-- Context Handling --
+	----------------------
+	
+	function To_Context(
+			Entity_Tag	: in Ada.Tags.Tag;
+			Id		: in Natural
+		) return KOW_Sec.Context_Type is
+		-- convert a given tagged type + id into a context
+	begin
+		return KOW_Sec.To_Context( Ada.Tags.Expanded_Name( Entity_Tag ) & "::" & Ada.Strings.Fixed.Trim( Natural'Image( Id ), Ada.Strings.Both ) );
+	end To_Context;
+
+	function To_Context( Entity : in KOW_Ent.Entity_Type'Class ) return KOW_Sec.Context_Type is
+		-- conver a given entity into a context
+	begin
+		if KOW_Ent.Is_new( Entity ) then
+			raise PROGRAM_ERROR with "can't convert a new entity into a context... call KOW_Ent.Store first";
+		end if;
+
+		return KOW_Sec.To_Context( Ada.Tags.Expanded_Name(  Entity'Tag ) & "::" & KOW_Ent.To_String( Entity.Id ) );
+	end To_Context;
 
 	----------------------
 	-- Auxiliar Methods --

@@ -41,6 +41,7 @@
 -- Ada 2005 --
 --------------
 with Ada.Strings.Unbounded;		use Ada.Strings.Unbounded;
+with Ada.Tags;
 
 
 -------------------
@@ -55,6 +56,19 @@ with APQ;
 package KOW_Sec.Entities is
 
 
+	----------------------
+	-- Context Handling --
+	----------------------
+	
+	function To_Context(
+			Entity_Tag	: in Ada.Tags.Tag;
+			Id		: in Natural
+		) return KOW_Sec.Context_Type;
+	-- convert a given tagged type + id into a context
+	
+
+	function To_Context( Entity : in KOW_Ent.Entity_Type'Class ) return KOW_Sec.Context_Type;
+	-- conver a given entity into a context
 
 	----------------------
 	-- USER ENTITY TYPE --
