@@ -181,7 +181,7 @@ package body KOW_Sec.Entities is
 		return Get_First( Q => Q, Unique => True );
 	exception
 		when NO_ENTITY =>
-			raise KOW_Sec.UNKNOWN_USER with Username;
+			raise KOW_Sec.UNKNOWN_USER with '"' & Username & '"';
 	end Get_user_Entity;
 
 
