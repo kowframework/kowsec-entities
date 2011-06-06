@@ -155,6 +155,11 @@ package KOW_Sec.Entities is
 	-- create a new user, saving it and then returning it's identity
 
 
+	procedure Change_Password(
+				Username	: in String;
+				New_Password	: in String
+			);
+	-- change the user's password
 
 	---------------------------------
 	-- USER IDENTITY PROPERTY TYPE --

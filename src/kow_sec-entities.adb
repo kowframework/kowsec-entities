@@ -292,6 +292,16 @@ package body KOW_Sec.Entities is
 		
 
 
+	procedure Change_Password(
+				Username	: in String;
+				New_Password	: in String
+			) is
+		-- change the user's password
+		Entity : User_Entity_Type := Get_User_Entity( Username );
+	begin
+		Entity.Password := To_Unbounded_String( New_Password );
+		Store( Entity );
+	end Change_Password;
 
 
 	---------------------------------
