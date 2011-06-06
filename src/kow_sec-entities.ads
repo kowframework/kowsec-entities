@@ -107,6 +107,9 @@ package KOW_Sec.Entities is
 	function Get_user_Entity( Username: in String ) return User_Entity_Type;
 	-- get the user entity by it's username
 
+	function Get_user_Entity( User_Identity : in KOW_Sec.User_Identity_Type ) return User_Entity_Type;
+	-- get the user entity by it's user identity
+
 	package User_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => User_Entity_Type );
 
 	-------------------------------

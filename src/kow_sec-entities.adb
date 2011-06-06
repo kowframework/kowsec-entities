@@ -186,6 +186,23 @@ package body KOW_Sec.Entities is
 
 
 
+	function Get_user_Entity( User_Identity : in KOW_Sec.User_Identity_Type ) return User_Entity_Type is
+		-- get the user entity by it's user identity
+		use User_Query_Builders;
+		Q : Query_Type;
+	begin
+		Append(
+				Q		=> Q,
+				Column		=> "user_identity",
+				Value		=> String( User_Identity ),
+				Appender	=> Appender_And,
+				Operator	=> Operator_Equals
+			);
+
+		return Get_First( Q => Q, Unique => True );
+	end Get_User_Entity;
+
+
 	-------------------------------
 	-- AUTHENTICATION MANAGEMENT --
 	-------------------------------
