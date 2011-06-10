@@ -176,7 +176,7 @@ package body KOW_Sec.Entities is
 				Column		=> "username",
 				Value		=> Username,
 				Appender	=> Appender_AND,
-				Operator	=> Operator_Equals
+				Operator	=> Operator_Equal_To
 			);
 		return Get_First( Q => Q, Unique => True );
 	exception
@@ -196,7 +196,7 @@ package body KOW_Sec.Entities is
 				Column		=> "user_identity",
 				Value		=> String( User_Identity ),
 				Appender	=> Appender_And,
-				Operator	=> Operator_Equals
+				Operator	=> Operator_Equal_To
 			);
 
 		return Get_First( Q => Q, Unique => True );
@@ -229,7 +229,7 @@ package body KOW_Sec.Entities is
 				Column		=> "username",
 				Value		=> Username,
 				Appender	=> Appender_AND,
-				Operator	=> Operator_Equals
+				Operator	=> Operator_Equal_To
 			);
 
 		Append_Password(
@@ -237,7 +237,7 @@ package body KOW_Sec.Entities is
 				Column		=> "password",
 				Value		=> Password,
 				Appender	=> Appender_AND,
-				Operator	=> Operator_Equals
+				Operator	=> Operator_Equal_To
 			);
 		E := Get_First( Q => Q, Unique => True );
 
@@ -265,7 +265,7 @@ package body KOW_Sec.Entities is
 				Column		=> "user_identity",
 				Value		=> String( User_Identity ),
 				Appender	=> Appender_AND,
-				Operator	=> Operator_Equals
+				Operator	=> Operator_Equal_To
 			);
 
 		U := Get_First( Q => Q, Unique => True );
