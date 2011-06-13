@@ -47,6 +47,7 @@ with APQ;
 -- KOW Framework --
 -------------------
 with KOW_Ent;			use KOW_Ent;
+with KOW_Ent.Id_Query_Builders;	use KOW_Ent.Id_Query_Builders;
 with KOW_Ent.Properties;
 
 package body KOW_Sec.Entities is
@@ -169,7 +170,7 @@ package body KOW_Sec.Entities is
 	function Get_user_Entity( Username: in String ) return User_Entity_Type is
 		-- get the user entity by it's username
 		use User_Query_Builders;
-		Q : Query_Type;
+		Q : Entity_Query_Type;
 	begin
 		Append(
 				Q		=> Q,
@@ -189,7 +190,7 @@ package body KOW_Sec.Entities is
 	function Get_user_Entity( User_Identity : in KOW_Sec.User_Identity_Type ) return User_Entity_Type is
 		-- get the user entity by it's user identity
 		use User_Query_Builders;
-		Q : Query_Type;
+		Q : Entity_Query_Type;
 	begin
 		Append(
 				Q		=> Q,
@@ -221,7 +222,7 @@ package body KOW_Sec.Entities is
 			) return User_Identity_Type is
 		use User_Query_Builders;
 
-		Q : Query_Type;
+		Q : Entity_Query_Type;
 		E : User_Entity_Type;
 	begin
 		Append(
@@ -257,7 +258,7 @@ package body KOW_Sec.Entities is
 		-- check if the user is registered into this manager
 		use User_Query_Builders;
 
-		Q : Query_Type;
+		Q : Entity_Query_Type;
 		U : User_Entity_Type;
 	begin
 		Append(

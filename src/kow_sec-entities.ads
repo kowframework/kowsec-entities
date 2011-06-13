@@ -48,7 +48,7 @@ with Ada.Tags;
 -- KOW Framework --
 -------------------
 with KOW_Ent;				use KOW_Ent;
-with KOW_Ent.Query_Builders;
+with KOW_Ent.Generic_Query_Builders;
 with KOW_Sec;				use KOW_Sec;
 
 with APQ;
@@ -110,7 +110,7 @@ package KOW_Sec.Entities is
 	function Get_user_Entity( User_Identity : in KOW_Sec.User_Identity_Type ) return User_Entity_Type;
 	-- get the user entity by it's user identity
 
-	package User_Query_Builders is new KOW_Ent.Query_Builders( Entity_Type => User_Entity_Type );
+	package User_Query_Builders is new KOW_Ent.Generic_Query_Builders( Entity_Type => User_Entity_Type );
 
 	-------------------------------
 	-- AUTHENTICATION MANAGEMENT --
