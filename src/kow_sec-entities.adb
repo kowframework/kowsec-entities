@@ -167,36 +167,39 @@ package body KOW_Sec.Entities is
 	-- USER ENTITY TYPE --
 	----------------------
 
-
 	overriding
-	function To_String( Entity : in User_Entity_Type ) return String is
-		-- return the user identity
+	procedure Post_Install(
+				Entity		: in out User_Entity_Type;
+				Data_Storage	: in out KOW_Ent.Data_Storage_Type'Class
+			) is
 	begin
-		return String( Entity.User_Identity );
-	end To_String;
+		KOW_Ent.Create_Index(
+					Data_Storage	=> Data_Storage,
+					Entity_Tag	=> User_Entity_Type'Tag,
+					Property_Names	=> ( 1 => Names.Login ),
+					Is_Unique	=> True
+				);
+
+		KOW_Ent.Create_Index(
+					Data_Storage	=> Data_Storage,
+					Entity_Tag	=> User_Entity_Type'Tag,
+					Property_Names	=> ( 1 => Names.Login, 2 => Names.Password ),
+					Is_Unique	=> True
+				);
+
+		KOW_Ent.Create_Index(
+					Data_Storage	=> Data_Storage,
+					Entity_Tag	=> User_Entity_Type'Tag,
+					Property_Names	=> ( 1 => Names.User_Identity ),
+					Is_Unique	=> True
+				);
+	end Post_Install;
 
 
-	overriding
-	function Describe( Entity : in User_Entity_Type ) return String is
-		-- return the full name of the user
-	begin
-		return Full_name( Get_user( Entity.User_Identity ) );
-	end Describe;
-
-
-	overriding
-	function Image_URL( Entity : in User_Entity_Type ) return String is
-		-- get the gravatar for the given user
-	begin
-		return Gravatar_URL( Get_User( Entity.User_Identity ) );
-	end Image_URL;
-
-
-	
 	function To_User_Data( Entity : in User_Entity_Type ) return User_Data_Type is
 		-- convert the entity to an KOW_sec.user type
 	begin
-		return Get_user( Entity.User_Identity );
+		return Get_User( Entity.User_Identity );
 	end To_User_Data;
 
 
@@ -213,7 +216,7 @@ package body KOW_Sec.Entities is
 	end To_User_Entity;
 
 
-	function Get_user_Entity( Username: in String ) return User_Entity_Type is
+	function Get_User_Entity( Username: in String ) return User_Entity_Type is
 		-- get the user entity by it's username
 		use User_Query_Builders;
 		Q : Entity_Query_Type;
@@ -229,11 +232,11 @@ package body KOW_Sec.Entities is
 	exception
 		when NO_ENTITY =>
 			raise KOW_Sec.UNKNOWN_USER with '"' & Username & '"';
-	end Get_user_Entity;
+	end Get_User_Entity;
 
 
 
-	function Get_user_Entity( User_Identity : in KOW_Sec.User_Identity_Type ) return User_Entity_Type is
+	function Get_User_Entity( User_Identity : in KOW_Sec.User_Identity_Type ) return User_Entity_Type is
 		-- get the user entity by it's user identity
 		use User_Query_Builders;
 		Q : Entity_Query_Type;
@@ -366,202 +369,5 @@ package body KOW_Sec.Entities is
 		Entity.Password := To_Unbounded_String( New_Password );
 		Store( Entity );
 	end Change_Password;
-
-
-	---------------------------------
-	-- USER IDENTITY PROPERTY TYPE --
-	---------------------------------
-
-
-	procedure Set_Property(	
-				Property	: in     User_Identity_Property_Type;		-- the property worker
-				Entity		: in out Entity_Type'Class;		-- the entity
-				Q		: in out APQ.Root_Query_Type'Class;	-- the query from witch to fetch the result
-				Connection	: in out APQ.Root_Connection_type'Class		-- the connection that belongs the query
-			) is
-		-- Set the property into the Entity.
-
-		Column : String := To_String( Property.Column_Name );
-		Index  : APQ.Column_Index_Type := APQ.Column_Index( Q, Column );
-		Value  : String := APQ.Value( Q, Index );
-	begin
-		Property.Setter.all(
-				Entity,
-				To_Identity( Value )
-			);
-	exception
-		when APQ.Null_Value =>
-			Property.Setter.all(
-				Entity,
-				Property.Default_Value
-			);
-	end Set_Property;
-
-	procedure Get_Property(
-				Property	: in     User_Identity_Property_Type;		-- the property worker
-				Entity		: in     Entity_Type'Class;		-- the entity
-				Query		: in out APQ.Root_Query_Type'Class;	-- the query to witch append the value to insert
-				Connection	: in out APQ.Root_Connection_type'Class		-- the connection that belongs the query
-			) is
-	begin
-		APQ.Append_Quoted( Query, Connection, To_String( Property.Getter.All( Entity ) ) );
-	end Get_Property;
-
-	overriding
-	procedure Set_Property(
-				Property	: in     User_Identity_Property_Type;		-- the property worker
-				Entity		: in out Entity_Type'Class;		-- the entity
-				Value		: in     String				-- the String representation of this value
-			) is
-		-- Set the property from a String representation of the value
-	begin
-		Property.Setter.all( Entity, To_Identity( Value ) );
-	end Set_Property;
-	
-	overriding
-	function Get_Property(
-				Property	: in     User_Identity_Property_Type;		-- the property worker
-				Entity		: in     Entity_Type'Class		-- the entity
-			) return String is
-	begin
-		return To_String( Property.Getter.all( Entity ) );
-	end Get_Property;
-
-
-	overriding
-	procedure Append_Create_Table( Property : in User_Identity_Property_Type; Query : in out APQ.Root_Query_Type'Class ) is
-	begin
-		APQ.Append(
-				Query,
-				To_String( Property.Column_Name ) &
-						" VARCHAR( 32 ) NOT NULL"
-			);
-	end Append_Create_Table;
-
-
-
-	function New_User_Identity_Property(
-				Column_Name	: in     String;
-				Getter		: User_Identity_Getter_Callback;
-				Setter		: User_Identity_Setter_Callback;
-				Default_Value	: in     User_Identity_Type := Anonymous_User_Identity;
-				Immutable	: in     Boolean := False
-			) return Entity_Property_Ptr is
-		-- used to assist the creation of User_Identity properties.
-		UId : User_Identity_Property_Type;
-	begin
-		UId.Column_Name	:= To_Unbounded_String( Column_Name );
-		UId.Getter		:= Getter;
-		UId.Setter		:= Setter;
-		UId.Default_Value	:= Default_Value;
-		UId.Immutable		:= Immutable;
-		return new User_Identity_Property_Type'( UId );
-	end New_User_Identity_Property;
-
-
-
-
-
-	------------------------------------------------
-	-- Getter and Setter for the User Entity Type --
-	------------------------------------------------
-
-
-	-- factory ::
-	function User_Entity_Factory return Entity_Type'Class is
---		Entity: User_Entity_Type;
-	begin
-		return User_Entity_Type'( others => <> );
-	end User_Entity_Factory;
-
-
-	--
-	-- identity
-	--
-	procedure Set_U_Identity( Entity : in out Entity_Type'Class; Identity : in User_Identity_type ) is
-	begin
-		User_Entity_Type( Entity ).User_Identity := Identity;
-	end Set_U_Identity;
-
-	function Get_U_Identity( Entity : in Entity_Type'Class ) return User_Identity_Type is
-	begin
-		return User_Entity_Type( Entity ).User_Identity;
-	end Get_U_Identity;
-	
-
-
-
-	-- 
-	-- username
-	--
-	procedure Set_U_Username( Entity : in out Entity_Type'Class; Username : in Unbounded_String ) is
-	begin
-		User_Entity_Type( Entity ).Username := Username;
-	end Set_U_Username;
-
-	function Get_U_Username( Entity : in Entity_Type'Class ) return Unbounded_String is
-	begin
-		return User_Entity_Type( Entity ).Username;
-	end Get_U_Username;
-	
-	
-
-	--
-	-- Password
-	--
-	procedure Set_U_Password( Entity : in out Entity_Type'Class; Password : in Unbounded_String ) is
-	begin
-		User_Entity_Type( Entity ).Password := Password;
-	end Set_U_Password;
-
-	function Get_U_Password( Entity : in Entity_Type'Class ) return Unbounded_String is
-	begin
-		return User_Entity_Type( Entity ).Password;
-	end Get_U_Password;
-
-
-
-begin
-	---------------------------
-	-- register the entities --
-	---------------------------
-
-	--
-	-- User Entity
-	--
-	KOW_Ent.Entity_Registry.Register(
-			Entity_Tag	=> User_Entity_Type'Tag,
-			Table_Name	=> "kow_users",
-			Id_Generator	=> null,
-			Factory		=> User_Entity_Factory'Access
-		);
-	
-	KOW_Ent.Entity_Registry.Add_Property(
-			Entity_Tag	=> User_Entity_Type'Tag,
-			Property	=> KOW_Ent.Properties.New_UString_Property(
-						Column_Name	=> "username",
-						Getter		=> Get_U_Username'Access,
-						Setter		=> Set_U_Username'Access,
-						Immutable	=> True
-					),
-			Is_Unique	=> True
-		);
-	KOW_Ent.Entity_Registry.Add_Property(
-			Entity_Tag	=> User_Entity_Type'Tag,
-			Property	=> KOW_Ent.Properties.New_Password_Property(
-						Column_Name	=> "password",
-						Getter		=> Get_U_Password'Access,
-						Setter		=> Set_U_Password'Access
-					)
-		);
-	KOW_Ent.Entity_Registry.Add_Property(
-			Entity_Tag	=> User_Entity_Type'Tag,
-			Property	=> New_User_Identity_Property(
-						Column_Name	=> "user_identity",
-						Getter		=> Get_U_Identity'Access,
-						Setter		=> Set_U_Identity'Access
-					),
-			Is_Unique	=> True
-		);
 
 end KOW_Sec.Entities;
