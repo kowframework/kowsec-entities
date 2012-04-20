@@ -116,7 +116,7 @@ package KOW_Sec.Entities is
 
 	package Names is
 		User_Identity	: constant KOW_Ent.String_Access := new String'( "user_identity" );
-		Login		: constant KOW_Ent.String_Access := new String'( "login" );
+		Username	: constant KOW_Ent.String_Access := new String'( "username" );
 		Password	: constant KOW_Ent.String_Access := new String'( "password" );
 	end Names;
 
@@ -127,8 +127,8 @@ package KOW_Sec.Entities is
 								Is_Id_Property	=> True
 							);
 
-		Login		: KOW_Ent.Properties.String_Property(
-								Name		=> Names.Login,
+		Username	: KOW_Ent.Properties.String_Property(
+								Name		=> Names.Username,
 								Container	=> User_Entity_Type'Unrestricted_Access,
 								String_Length	=> 100,
 								Allow_Null	=> False
@@ -171,9 +171,9 @@ package KOW_Sec.Entities is
 								Entity_Alias	=> "kow_users"
 							);
 
-	-------------------------------
-	-- AUTHENTICATION MANAGEMENT --
-	-------------------------------
+	---------------------------------
+	-- Authentication Manager Type --
+	---------------------------------
 
 	type Authentication_Manager_Type is new KOW_Sec.Authentication_Manager_Interface with null record;
 

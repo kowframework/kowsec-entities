@@ -253,9 +253,10 @@ package body KOW_Sec.Entities is
 	end Get_User_Entity;
 
 
-	-------------------------------
-	-- AUTHENTICATION MANAGEMENT --
-	-------------------------------
+
+	---------------------------------
+	-- Authentication Manager Type --
+	---------------------------------
 
 
 	function Get_Name( Manager : in Authentication_Manager_Type ) return String is
@@ -269,35 +270,72 @@ package body KOW_Sec.Entities is
 				Username: in String;
 				Password: in String
 			) return User_Identity_Type is
-		use User_Query_Builders;
 
-		Q : Entity_Query_Type;
-		E : User_Entity_Type;
+		use KOW_Ent.Queries;
+		Q : Query_Type;
+
+		Username_Operation, Password_Operation : Logic_relations.Stored_Vs_Value_Operation;
+
+		Username_Value : aliased Value_Type( Type_Of => APQ_String, length => Username'Length );
+		Password_Value : aliased Value_Type( Type_Of => APQ_String, Length => Password'Length );
+
 	begin
+		Q.Entity_Type := User_Entity_Type'Tag;
+
+		Username_Value.String_Value := Username;
+		Password_Value.String_Value := Password;
+		-- TODO :: verify if we are using the password value as we should
+
+		Username_Operation := (
+						Entity_Tag	=> User_Entity_Type'Tag,
+						Property_name	=> Names.Username,
+						Value		=> Username_Value'Access,
+						Relation	=> Relation_Equal_To,
+						Operator	=> Operator_And
+					);
+
+		Password_Operation := (
+						Entity_Tag	=> User_Entity_Type'Tag,
+						Property_name	=> Names.Password,
+						Value		=> Password_Value'Access,
+						Relation	=> Relation_Equal_To,
+						Operator	=> Operator_And
+					);
+
 		Append(
-				Q		=> Q,
-				Column		=> "username",
-				Value		=> Username,
-				Appender	=> Appender_AND,
-				Operator	=> Operator_Equal_To
+				Logic_Criteria	=> Q.Logic_Criteria,
+				Operation	=> Username_Operation
 			);
 
-		Append_Password(
-				Q		=> Q,
-				Column		=> "password",
-				Value		=> Password,
-				Appender	=> Appender_AND,
-				Operator	=> Operator_Equal_To
+		Append(
+				Logic_Crieteria	=> Q.Logic_Criteria,
+				Operation	=> Password_Operation
 			);
-		E := Get_First( Q => Q, Unique => True );
+
+		declare
+			use KOW_Ent.Data_Storages;
+			Loader : Entity_Loader_Interface'Class := New_Loader( Data_Storage_Type'Class( Get_Data_Storage( User_Entity_Type'Tag ).all ), Q );
+			Entity : User_Entity_Type;
+		begin
+			-- run the query
+			Execute( Loader );
+
+			-- fetch the results (if any)
+			Fetch( Loader );
+			if not Has_Element( Loader ) then
+				raise KOW_Sec.INVALID_CREDENTIALS with "Login for the user """ & Username & """ failed!";
+			end if;
+			Load( Loader, Entity );
 
 
-		return E.User_Identity;
-	exception
-		when NO_ENTITY =>
-			raise KOW_Sec.INVALID_CREDENTIALS with "Login for the user """ & Username & """ failed!";
-		when e : others =>
-			Ada.Exceptions.Reraise_Occurrence( e );
+			-- check if it's the only result
+			Fetch( Loader );
+			if Has_Element( Loader ) then
+				raise KOW_Sec.INVALID_CREDENTIALS with "Login with multiple results. This has got to be a bug.";
+			end if;
+
+			return Entity.User_Identity.Value;
+		end;
 	end Do_Login;
 
 	function Has_User(
@@ -305,25 +343,37 @@ package body KOW_Sec.Entities is
 				User_Identity	: User_Identity_Type
 			) return Boolean is
 		-- check if the user is registered into this manager
-		use User_Query_Builders;
+		use KOW_Ent;
+		use KOW_Ent.Queries;
 
-		Q : Entity_Query_Type;
-		U : User_Entity_Type;
+		Q : Query_Type;
+		Identity_Value : aliased Value_Type( APQ_String, User_Identity'Length );
+		Identity_Operation: Logic_relations.Stored_Vs_Value_Operation;
 	begin
+		Q.Entity_Type := User_Entity_Type'Tag;
+		Identiy_Value.String_Value := To_String( User_Identity );
+
+		Identity_Operation := (
+						Entity_Tag	=> User_Entity_Type'Tag,
+						Property_name	=> Names.User_Identity,
+						Value		=> Identity_Value'Access,
+						Relation	=> Relation_Equal_To,
+						Operator	=> Operator_And
+					);
 		Append(
-				Q		=> Q,
-				Column		=> "user_identity",
-				Value		=> String( User_Identity ),
-				Appender	=> Appender_AND,
-				Operator	=> Operator_Equal_To
+				Logic_Criteria	=> Q.Logic_Criteria,
+				Operation	=> Identity_Operation
 			);
 
-		U := Get_First( Q => Q, Unique => True );
-
-		return True;
-	exception
-		when NO_ENTITY =>
-			return false;
+		declare
+			use KOW_Ent.Data_Storages;
+			Loader : Entity_Loader_Interface'Class := New_Loader( Data_Storage_Type'Class( Get_Data_Storage( User_Entity_Type'Tag ).all ), Q );
+		begin
+			Execute( Loader );
+			Fetch( Loader );
+			return Has_Element( Loader );
+			-- notice that false positives aren't that critical in this code
+		end;
 	end Has_User;
 
 
