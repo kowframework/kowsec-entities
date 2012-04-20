@@ -70,32 +70,79 @@ package KOW_Sec.Entities is
 	function To_Context( Entity : in KOW_Ent.Entity_Type'Class ) return KOW_Sec.Context_Type;
 	-- conver a given entity into a context
 
+
+
+	---------------------------------
+	-- User Identity Property Type --
+	---------------------------------
+
+	type User_Identity_Property_Type(
+					Name		: KOW_Ent.Property_Name_Type;
+					Container	: KOW_Ent.Property_Container_Ptr;
+					Is_Id_Property	: Boolean
+				) is new KOW_Ent.Property_Type( Name, Container, false ) with record
+		-- The user identity must always be set as the functions of the property type expects
+		-- it to be a valid identity
+		Value	: KOW_Sec.User_Identity_Type := KOW_Sec.Anonymous_User_Identity;
+	end record;
+
+	overriding
+	function Get_Type( Property : User_Identity_Property_Type ) return KOW_Ent.Type_Of_Data_Type;
+	-- always returns APQ_String
+
+	overriding
+	function Get_Value(
+				Property	: in User_Identity_Property_Type;
+				For_Store	: in Boolean
+			) return KOW_Ent.Value_Type;
+	-- read the value
+	
+	overriding
+	procedure Set_Value(
+				Property	: in out User_Identity_Property_Type;
+				Value		: in     KOW_Ent.Value_Type
+			);
+	-- set the value
+
+
+	overriding
+	function Is_Id( Property : in User_Identity_Property_Type ) return Boolean;
+	-- returns property.is_id_property
+
+
 	----------------------
 	-- USER ENTITY TYPE --
 	----------------------
 
 	type User_Entity_Type is new KOW_Ent.Entity_Type with record
-		User_Identity	: User_Identity_Type;
-		Username	: Unbounded_String;
-		Password	: Unbounded_String;
-		-- well, we need some place to store user's password, don't we?
+		User_Identity	: User_Identity_Property_Type(
+								Name		=> Names.User_Identity,
+								Container	=> User_Entity_Type'Unrestricted_Access,
+								Is_Id_Property	=> True
+							);
+
+		Login		: KOW_Ent.Properties.String_Property(
+								Name		=> Names.Login,
+								Container	=> User_Entity_Type'Unrestricted_Access,
+								String_Length	=> 100,
+								Allow_Null	=> False
+							);
+		-- the login can be the user email address; in which case proper email validation
+		-- should be implemented.
+
+		Password	: KOW_Ent.Properties.Password_Property(
+								Name		=> Names.Password,
+								Container	=> User_Entity_Type'Unrestricted_Access
+							);
 	end record;
 
+
+	overriding
+	procedure Post_Install(
+				Entity		: in out User_Entity_Type;
+				Data_Storage	: in out KOW_Ent.Data_Storage_Type'Class
+			);
 	
-	overriding
-	function To_String( Entity : in User_Entity_Type ) return String;
-	-- return the user identity
-
-
-	overriding
-	function Describe( Entity : in User_Entity_Type ) return String;
-	-- return the full name of the user
-	
-	overriding
-	function Image_URL( Entity : in User_Entity_Type ) return String;
-	-- get the gravatar for the given user
-
-
 	
 	function To_User_Data( Entity : in User_Entity_Type ) return User_Data_Type;
 	-- convert the entity to an KOW_sec.user type
@@ -104,13 +151,11 @@ package KOW_Sec.Entities is
 	-- convert the user type to an user entity type
 	-- assumes the user is already in the database.
 
-	function Get_user_Entity( Username: in String ) return User_Entity_Type;
+	function Get_User_Entity( Username: in String ) return User_Entity_Type;
 	-- get the user entity by it's username
 
-	function Get_user_Entity( User_Identity : in KOW_Sec.User_Identity_Type ) return User_Entity_Type;
+	function Get_User_Entity( User_Identity : in KOW_Sec.User_Identity_Type ) return User_Entity_Type;
 	-- get the user entity by it's user identity
-
-	package User_Query_Builders is new KOW_Ent.Generic_Query_Builders( Entity_Type => User_Entity_Type );
 
 	-------------------------------
 	-- AUTHENTICATION MANAGEMENT --

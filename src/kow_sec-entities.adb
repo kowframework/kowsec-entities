@@ -116,6 +116,52 @@ package body KOW_Sec.Entities is
 --	end Generate_Group_Id;
 
 
+	---------------------------------
+	-- User Identity Property Type --
+	---------------------------------
+
+
+	overriding
+	function Get_Type( Property : User_Identity_Property_Type ) return KOW_Ent.Type_Of_Data_Type is
+		-- always returns APQ_String
+	begin
+		return KOW_Ent.APQ_String;
+	end Get_Type;
+
+	overriding
+	function Get_Value(
+				Property	: in User_Identity_Property_Type;
+				For_Store	: in Boolean
+			) return KOW_Ent.Value_Type is
+		-- read the value
+		Str_Val : constant String := KOW_Sec.To_String( Property.Value );
+		Val	: KOW_Ent.Value_Type( Type_Of => KOW_Ent.APQ_String, String_Length => Str_Val'Length );
+	begin
+		Val.String_Value := Str_Val;
+		return Val;
+	end Get_Value;
+
+
+	overriding
+	procedure Set_Value(
+				Property	: in out User_Identity_Property_Type;
+				Value		: in     KOW_Ent.Value_Type
+			) is
+		-- set the value
+		use KOW_Ent;
+	begin
+		pragma Assert( Value.Type_Of = APQ_String, "Setting user identity from a non-string type" );
+
+		Property.Value := KOW_Sec.To_String( Value.String_Value );
+	end Set_Value;
+
+
+	overriding
+	function Is_Id( Property : in User_Identity_Property_Type ) return Boolean is
+		-- returns property.is_id_property
+	begin
+		return Property.Is_Id_Property;
+	end Is_Id;
 
 	----------------------
 	-- USER ENTITY TYPE --
