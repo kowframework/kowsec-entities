@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# 
+# Local configuration file for KOW Lib
+
+
+
+project="kowsec-entities"
+
+
+set_configuration KOWSECENTITIES_EXTERNALLY_BUILT "false"

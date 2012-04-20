@@ -8,6 +8,8 @@
 -- $Author$
 
 
+with "kowent";
+with "kowsec";
 
 project KOWSec.Entities is
 
