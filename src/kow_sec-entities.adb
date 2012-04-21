@@ -211,20 +211,83 @@ package body KOW_Sec.Entities is
 				Entity	: in out User_Entity_Type;
 				Username: in     String
 			) is
-		-- get the user entity by it's username
+		use KOW_Ent;
+		use KOW_Ent.Queries;
+
+		Q : Query_Type;
+		Username_Value : aliased Value_Type( APQ_String, Username'Length );
+		Username_Opera : Logic_relations.Stored_Vs_Value_Operation;
 	begin
-		null;
-		--Load_Unique( Entity, Names.Username, Username );
+		Q.Entity_Tag := User_Entity_Type'Tag;
+		Username_Value.String_Value := Username;
+
+		Username_Opera := (
+						Ada.Finalization.Controlled with
+						Entity_Tag	=> User_Entity_Type'Tag,
+						Property_name	=> Names.Username,
+						Value		=> Username_Value'Unchecked_Access,
+						Relation	=> Relation_Equal_To,
+						Operator	=> Operator_And
+					);
+		Append(
+				Criteria	=> Q.Logic_Criteria,
+				Operation	=> Username_Opera
+			);
+
+		declare
+			use KOW_Ent.Data_Storages;
+			Loader : Entity_Loader_Interface'Class := New_Loader( Data_Storage_Type'Class( Get_Data_Storage( User_Entity_Type'Tag ).all ), Q );
+		begin
+			Execute( Loader );
+			Fetch( Loader );
+			if not Has_Element( Loader ) then
+				raise KOW_Sec.UNKNOWN_USER with "username '" & Username & '''; 
+			end if;
+			Load( Loader, Entity );
+		end;
 	end Get_User_Entity;
+
+
 
 	procedure Get_User_Entity(
 				Entity		: in out User_Entity_Type;
 				User_Identity	: in     KOW_Sec.User_Identity_Type
 			) is
-	-- get the user entity by it's user identity
+		-- get the user entity by it's user identity
+		use KOW_Ent;
+		use KOW_Ent.Queries;
+
+		Q : Query_Type;
+		Identity_Value : aliased Value_Type( APQ_String, User_Identity'Length );
+		Identity_Operation: Logic_relations.Stored_Vs_Value_Operation;
 	begin
-		null;
-		--Load_Unique( Entity, Names.Username, Username );
+		Q.Entity_Tag := User_Entity_Type'Tag;
+		Identity_Value.String_Value := To_String( User_Identity );
+
+		Identity_Operation := (
+						Ada.Finalization.Controlled with
+						Entity_Tag	=> User_Entity_Type'Tag,
+						Property_name	=> Names.User_Identity,
+						Value		=> Identity_Value'Unchecked_Access,
+						Relation	=> Relation_Equal_To,
+						Operator	=> Operator_And
+					);
+		Append(
+				Criteria	=> Q.Logic_Criteria,
+				Operation	=> Identity_Operation
+			);
+
+		declare
+			use KOW_Ent.Data_Storages;
+			Loader : Entity_Loader_Interface'Class := New_Loader( Data_Storage_Type'Class( Get_Data_Storage( User_Entity_Type'Tag ).all ), Q );
+		begin
+			Execute( Loader );
+			Fetch( Loader );
+			if not Has_Element( Loader ) then
+				raise KOW_Sec.UNKNOWN_USER with "identity '" & KOW_Sec.To_String( User_Identity ) & '''; 
+			end if;
+			Load( Loader, Entity );
+		end;
 	end Get_User_Entity;
 
 
