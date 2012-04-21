@@ -47,8 +47,11 @@ with APQ;
 -- KOW Framework --
 -------------------
 with KOW_Ent;			use KOW_Ent;
-with KOW_Ent.Id_Query_Builders;	use KOW_Ent.Id_Query_Builders;
+with KOW_Ent.Data_Storages;
 with KOW_Ent.Properties;
+with KOW_Ent.Queries;
+with KOW_Ent.Queries.Logic_Relations;
+with KOW_Lib.String_Util;
 
 package body KOW_Sec.Entities is
 
@@ -388,12 +391,13 @@ package body KOW_Sec.Entities is
 				Account_Status	: in KOW_Sec.Account_Status_Type := KOW_Sec.Account_Enabled
 			) return User_Identity_Type is
 		-- create a new user and store it in the database backend
+		use KOW_Lib.String_Util;
 		Entity	: User_Entity_Type;
 		Data	: KOW_Sec.User_Data_Type;
 	begin
-		Entity.User_Identity	:= KOW_Sec.New_User_Identity;
-		Entity.Username := To_Unbounded_String( Username );
-		Entity.Password := To_Unbounded_String( Password );
+		Entity.User_Identity.Value := KOW_Sec.New_User_Identity;
+		Copy( From => Username, To => Entity.Username.String_Value );
+		Copy( From => Password, To => Entity.Password.String_Value );
 
 		Store( Entity );
 		-- if the username is duplicated, an exception will be raised right here :)
@@ -416,7 +420,7 @@ package body KOW_Sec.Entities is
 		-- change the user's password
 		Entity : User_Entity_Type := Get_User_Entity( Username );
 	begin
-		Entity.Password := To_Unbounded_String( New_Password );
+		KOW_Lib.String_Util.Copy(From => New_Password, To => Entity.Password.String_Value );
 		Store( Entity );
 	end Change_Password;
 
