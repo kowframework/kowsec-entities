@@ -156,14 +156,16 @@ package KOW_Sec.Entities is
 	function To_User_Data( Entity : in User_Entity_Type ) return User_Data_Type;
 	-- convert the entity to an KOW_sec.user type
 
-	function To_User_Entity( User : in User_Data_Type ) return User_Entity_Type;
-	-- convert the user type to an user entity type
-	-- assumes the user is already in the database.
-
-	function Get_User_Entity( Username: in String ) return User_Entity_Type;
+	procedure Get_User_Entity(
+				Entity	: in out User_Entity_Type;
+				Username: in     String
+			);
 	-- get the user entity by it's username
 
-	function Get_User_Entity( User_Identity : in KOW_Sec.User_Identity_Type ) return User_Entity_Type;
+	procedure Get_User_Entity(
+				Entity		: in out User_Entity_Type;
+				User_Identity	: in     KOW_Sec.User_Identity_Type
+			);
 	-- get the user entity by it's user identity
 
 

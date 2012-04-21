@@ -76,7 +76,7 @@ package body KOW_Sec.Entities is
 			raise PROGRAM_ERROR with "can't convert a new entity into a context... call KOW_Ent.Store first";
 		end if;
 
-		return KOW_Sec.To_Context( Ada.Tags.Expanded_Name(  Entity'Tag ) & "::" & KOW_Ent.To_String( Entity.Id ) );
+		return KOW_Sec.To_Context( Ada.Tags.Expanded_Name(  Entity'Tag ) & "::" & KOW_Ent.To_String( KOW_Ent.Get_Value( KOW_Ent.Get_ID( Entity ) ) ) );
 	end To_Context;
 
 	----------------------
@@ -155,7 +155,7 @@ package body KOW_Sec.Entities is
 	begin
 		pragma Assert( Value.Type_Of = APQ_String, "Setting user identity from a non-string type" );
 
-		Property.Value := KOW_Sec.To_String( Value.String_Value );
+		Property.Value := KOW_Sec.To_Identity( Value.String_Value );
 	end Set_Value;
 
 
@@ -179,14 +179,14 @@ package body KOW_Sec.Entities is
 		KOW_Ent.Create_Index(
 					Data_Storage	=> Data_Storage,
 					Entity_Tag	=> User_Entity_Type'Tag,
-					Property_Names	=> ( 1 => Names.Login ),
+					Property_Names	=> ( 1 => Names.Username ),
 					Is_Unique	=> True
 				);
 
 		KOW_Ent.Create_Index(
 					Data_Storage	=> Data_Storage,
 					Entity_Tag	=> User_Entity_Type'Tag,
-					Property_Names	=> ( 1 => Names.Login, 2 => Names.Password ),
+					Property_Names	=> ( 1 => Names.Username, 2 => Names.Password ),
 					Is_Unique	=> True
 				);
 
@@ -202,57 +202,28 @@ package body KOW_Sec.Entities is
 	function To_User_Data( Entity : in User_Entity_Type ) return User_Data_Type is
 		-- convert the entity to an KOW_sec.user type
 	begin
-		return Get_User( Entity.User_Identity );
+		return Get_User( Entity.User_Identity.Value );
 	end To_User_Data;
 
 
-	function To_User_Entity( User : in User_Data_Type ) return User_Entity_Type is
-		-- convert the user type to an user entity type
-		-- assumes the user is already in the database.
-		Entity : User_Entity_Type;
-	begin
-		Entity.User_Identity := User.Identity;
-
-		-- TODO :: try to catch the username from the database backend...
-		-- Entity.Id := Generate_User_ID( Entity );
-		return Entity;
-	end To_User_Entity;
-
-
-	function Get_User_Entity( Username: in String ) return User_Entity_Type is
+	procedure Get_User_Entity(
+				Entity	: in out User_Entity_Type;
+				Username: in     String
+			) is
 		-- get the user entity by it's username
-		use User_Query_Builders;
-		Q : Entity_Query_Type;
 	begin
-		Append(
-				Q		=> Q,
-				Column		=> "username",
-				Value		=> Username,
-				Appender	=> Appender_AND,
-				Operator	=> Operator_Equal_To
-			);
-		return Get_First( Q => Q, Unique => True );
-	exception
-		when NO_ENTITY =>
-			raise KOW_Sec.UNKNOWN_USER with '"' & Username & '"';
+		null;
+		--Load_Unique( Entity, Names.Username, Username );
 	end Get_User_Entity;
 
-
-
-	function Get_User_Entity( User_Identity : in KOW_Sec.User_Identity_Type ) return User_Entity_Type is
-		-- get the user entity by it's user identity
-		use User_Query_Builders;
-		Q : Entity_Query_Type;
+	procedure Get_User_Entity(
+				Entity		: in out User_Entity_Type;
+				User_Identity	: in     KOW_Sec.User_Identity_Type
+			) is
+	-- get the user entity by it's user identity
 	begin
-		Append(
-				Q		=> Q,
-				Column		=> "user_identity",
-				Value		=> String( User_Identity ),
-				Appender	=> Appender_And,
-				Operator	=> Operator_Equal_To
-			);
-
-		return Get_First( Q => Q, Unique => True );
+		null;
+		--Load_Unique( Entity, Names.Username, Username );
 	end Get_User_Entity;
 
 
