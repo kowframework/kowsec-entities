@@ -33,6 +33,7 @@
 -- Ada 2005 --
 --------------
 with Ada.Exceptions;
+with Ada.Finalization;
 with Ada.Strings;
 with Ada.Strings.Fixed;
 with Ada.Strings.Hash;
@@ -248,39 +249,41 @@ package body KOW_Sec.Entities is
 		use KOW_Ent.Queries;
 		Template	: aliased User_Entity_Type;
 	begin
-		KOW_Lib.String_Util.Copy( From => Username, TO => Template.Username.String_Value );
+		KOW_Lib.String_Util.Copy( From => Username, TO => Template.Username.Value.String_Value );
 		Extra_Properties.Set_Password( Template.Password, Password );
 
 		declare
 			Q : Query_Type;
 			Username_Operation, Password_Operation : Logic_relations.Stored_Vs_Value_Operation;
-			Username_Value : aliased Value_Type := Get_Value( Template.Username );
-			Password_Value : aliased Value_Type := Get_Value( Template.Password );
+			Username_Value : aliased Value_Type := Properties.Get_Value( Template.Username, False );
+			Password_Value : aliased Value_Type := Extra_Properties.Get_Value( Template.Password, False );
 		begin
 
 			Username_Operation := (
+							Ada.Finalization.Controlled with
 							Entity_Tag	=> User_Entity_Type'Tag,
 							Property_name	=> Names.Username,
-							Value		=> Username_Value'Access,
+							Value		=> Username_Value'Unchecked_Access,
 							Relation	=> Relation_Equal_To,
 							Operator	=> Operator_And
 						);
 
 			Password_Operation := (
+							Ada.Finalization.Controlled with
 							Entity_Tag	=> User_Entity_Type'Tag,
 							Property_name	=> Names.Password,
-							Value		=> Password_Value'Access,
+							Value		=> Password_Value'Unchecked_Access,
 							Relation	=> Relation_Equal_To,
 							Operator	=> Operator_And
 						);
 
 			Append(
-					Logic_Criteria	=> Q.Logic_Criteria,
+					Criteria	=> Q.Logic_Criteria,
 					Operation	=> Username_Operation
 				);
 
 			Append(
-					Logic_Crieteria	=> Q.Logic_Criteria,
+					Criteria	=> Q.Logic_Criteria,
 					Operation	=> Password_Operation
 				);
 
@@ -323,18 +326,19 @@ package body KOW_Sec.Entities is
 		Identity_Value : aliased Value_Type( APQ_String, User_Identity'Length );
 		Identity_Operation: Logic_relations.Stored_Vs_Value_Operation;
 	begin
-		Q.Entity_Type := User_Entity_Type'Tag;
-		Identiy_Value.String_Value := To_String( User_Identity );
+		Q.Entity_Tag := User_Entity_Type'Tag;
+		Identity_Value.String_Value := To_String( User_Identity );
 
 		Identity_Operation := (
+						Ada.Finalization.Controlled with
 						Entity_Tag	=> User_Entity_Type'Tag,
 						Property_name	=> Names.User_Identity,
-						Value		=> Identity_Value'Access,
+						Value		=> Identity_Value'Unchecked_Access,
 						Relation	=> Relation_Equal_To,
 						Operator	=> Operator_And
 					);
 		Append(
-				Logic_Criteria	=> Q.Logic_Criteria,
+				Criteria	=> Q.Logic_Criteria,
 				Operation	=> Identity_Operation
 			);
 
@@ -366,19 +370,19 @@ package body KOW_Sec.Entities is
 		Data	: KOW_Sec.User_Data_Type;
 	begin
 		Entity.User_Identity.Value := KOW_Sec.New_User_Identity;
-		Copy( From => Username, To => Entity.Username.String_Value );
-		Copy( From => Password, To => Entity.Password.String_Value );
+		Copy( From => Username, To => Entity.Username.Value.String_Value );
+		Copy( From => Password, To => Entity.Password.Value.String_Value );
 
 		Store( Entity );
 		-- if the username is duplicated, an exception will be raised right here :)
 		-- so.... the user won't be saved at all
 
 
-		Data.Identity := Entity.User_Identity;
+		Data.Identity := Entity.User_Identity.Value;
 		Data.Account_Status := Account_Status;
 		KOW_Sec.Store_User( Data );
 
-		return Entity.User_Identity;
+		return Entity.User_Identity.Value;
 	end New_User;
 		
 
@@ -388,9 +392,10 @@ package body KOW_Sec.Entities is
 				New_Password	: in String
 			) is
 		-- change the user's password
-		Entity : User_Entity_Type := Get_User_Entity( Username );
+		Entity : User_Entity_Type;
 	begin
-		KOW_Lib.String_Util.Copy(From => New_Password, To => Entity.Password.String_Value );
+ 		Get_User_Entity( Entity, Username );
+		KOW_Lib.String_Util.Copy(From => New_Password, To => Entity.Password.Value.String_Value );
 		Store( Entity );
 	end Change_Password;
 
