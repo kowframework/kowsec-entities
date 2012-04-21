@@ -173,7 +173,7 @@ package body KOW_Sec.Entities is
 	overriding
 	procedure Post_Install(
 				Entity		: in out User_Entity_Type;
-				Data_Storage	: in out KOW_Ent.Data_Storage_Type'Class
+				Data_Storage	: in out KOW_Ent.Data_Storage_Interface'Class
 			) is
 	begin
 		KOW_Ent.Create_Index(
@@ -275,69 +275,68 @@ package body KOW_Sec.Entities is
 			) return User_Identity_Type is
 
 		use KOW_Ent.Queries;
-		Q : Query_Type;
-
-		Username_Operation, Password_Operation : Logic_relations.Stored_Vs_Value_Operation;
-
-		Username_Value : aliased Value_Type( Type_Of => APQ_String, length => Username'Length );
-		Password_Value : aliased Value_Type( Type_Of => APQ_String, Length => Password'Length );
-
+		Template	: aliased User_Entity_Type;
 	begin
-		Q.Entity_Type := User_Entity_Type'Tag;
-
-		Username_Value.String_Value := Username;
-		Password_Value.String_Value := Password;
-		-- TODO :: verify if we are using the password value as we should
-
-		Username_Operation := (
-						Entity_Tag	=> User_Entity_Type'Tag,
-						Property_name	=> Names.Username,
-						Value		=> Username_Value'Access,
-						Relation	=> Relation_Equal_To,
-						Operator	=> Operator_And
-					);
-
-		Password_Operation := (
-						Entity_Tag	=> User_Entity_Type'Tag,
-						Property_name	=> Names.Password,
-						Value		=> Password_Value'Access,
-						Relation	=> Relation_Equal_To,
-						Operator	=> Operator_And
-					);
-
-		Append(
-				Logic_Criteria	=> Q.Logic_Criteria,
-				Operation	=> Username_Operation
-			);
-
-		Append(
-				Logic_Crieteria	=> Q.Logic_Criteria,
-				Operation	=> Password_Operation
-			);
+		KOW_Lib.String_Util.Copy( From => Username, TO => Template.Username.String_Value );
+		Extra_Properties.Set_Password( Template.Password, Password );
 
 		declare
-			use KOW_Ent.Data_Storages;
-			Loader : Entity_Loader_Interface'Class := New_Loader( Data_Storage_Type'Class( Get_Data_Storage( User_Entity_Type'Tag ).all ), Q );
-			Entity : User_Entity_Type;
+			Q : Query_Type;
+			Username_Operation, Password_Operation : Logic_relations.Stored_Vs_Value_Operation;
+			Username_Value : aliased Value_Type := Get_Value( Template.Username );
+			Password_Value : aliased Value_Type := Get_Value( Template.Password );
 		begin
-			-- run the query
-			Execute( Loader );
 
-			-- fetch the results (if any)
-			Fetch( Loader );
-			if not Has_Element( Loader ) then
-				raise KOW_Sec.INVALID_CREDENTIALS with "Login for the user """ & Username & """ failed!";
-			end if;
-			Load( Loader, Entity );
+			Username_Operation := (
+							Entity_Tag	=> User_Entity_Type'Tag,
+							Property_name	=> Names.Username,
+							Value		=> Username_Value'Access,
+							Relation	=> Relation_Equal_To,
+							Operator	=> Operator_And
+						);
+
+			Password_Operation := (
+							Entity_Tag	=> User_Entity_Type'Tag,
+							Property_name	=> Names.Password,
+							Value		=> Password_Value'Access,
+							Relation	=> Relation_Equal_To,
+							Operator	=> Operator_And
+						);
+
+			Append(
+					Logic_Criteria	=> Q.Logic_Criteria,
+					Operation	=> Username_Operation
+				);
+
+			Append(
+					Logic_Crieteria	=> Q.Logic_Criteria,
+					Operation	=> Password_Operation
+				);
+
+			declare
+				use KOW_Ent.Data_Storages;
+				Loader : Entity_Loader_Interface'Class := New_Loader( Data_Storage_Type'Class( Get_Data_Storage( User_Entity_Type'Tag ).all ), Q );
+				Entity : User_Entity_Type;
+			begin
+				-- run the query
+				Execute( Loader );
+
+				-- fetch the results (if any)
+				Fetch( Loader );
+				if not Has_Element( Loader ) then
+					raise KOW_Sec.INVALID_CREDENTIALS with "Login for the user """ & Username & """ failed!";
+				end if;
+				Load( Loader, Entity );
 
 
-			-- check if it's the only result
-			Fetch( Loader );
-			if Has_Element( Loader ) then
-				raise KOW_Sec.INVALID_CREDENTIALS with "Login with multiple results. This has got to be a bug.";
-			end if;
+				-- check if it's the only result
+				Fetch( Loader );
+				if Has_Element( Loader ) then
+					raise KOW_Sec.INVALID_CREDENTIALS with "Login with multiple results. This has got to be a bug.";
+				end if;
 
-			return Entity.User_Identity.Value;
+				return Entity.User_Identity.Value;
+			end;
 		end;
 	end Do_Login;
 

@@ -48,7 +48,9 @@ with Ada.Tags;
 -- KOW Framework --
 -------------------
 with KOW_Ent;				use KOW_Ent;
-with KOW_Ent.Generic_Query_Builders;
+with KOW_Ent.DB.Data_Storages;
+with KOW_Ent.Extra_Properties;
+with KOW_Ent.Properties;
 with KOW_Sec;				use KOW_Sec;
 
 with APQ;
@@ -115,9 +117,9 @@ package KOW_Sec.Entities is
 	----------------------
 
 	package Names is
-		User_Identity	: constant KOW_Ent.String_Access := new String'( "user_identity" );
-		Username	: constant KOW_Ent.String_Access := new String'( "username" );
-		Password	: constant KOW_Ent.String_Access := new String'( "password" );
+		User_Identity	: constant KOW_Ent.Property_Name_Type := new String'( "user_identity" );
+		Username	: constant KOW_Ent.Property_Name_Type := new String'( "username" );
+		Password	: constant KOW_Ent.Property_Name_Type := new String'( "password" );
 	end Names;
 
 	type User_Entity_Type is new KOW_Ent.Entity_Type with record
@@ -136,7 +138,7 @@ package KOW_Sec.Entities is
 		-- the login can be the user email address; in which case proper email validation
 		-- should be implemented.
 
-		Password	: KOW_Ent.Properties.Password_Property(
+		Password	: KOW_Ent.Extra_Properties.Password_Property_Type(
 								Name		=> Names.Password,
 								Container	=> User_Entity_Type'Unrestricted_Access
 							);
@@ -147,7 +149,7 @@ package KOW_Sec.Entities is
 	overriding
 	procedure Post_Install(
 				Entity		: in out User_Entity_Type;
-				Data_Storage	: in out KOW_Ent.Data_Storage_Type'Class
+				Data_Storage	: in out KOW_Ent.Data_Storage_Interface'Class
 			);
 	
 	
